@@ -1,0 +1,71 @@
+# Private data and generated artifacts
+data/
+Dataset/
+outputs/
+reports/figures/
+*.csv
+*.parquet
+*.xlsx
+*.xls
+*.feather
+*.h5
+
+# Separate projects and local workspace material
+dashboard/
+Overleaf-Thesis/
+.cursor/
+_archive*/
+*backup*/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environments and build products
+.venv/
+venv/
+env/
+thesis/
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Python caches, tests, and coverage
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.coverage
+.coverage.*
+htmlcov/
+
+# Jupyter and scientific-computing caches
+.ipynb_checkpoints/
+.jupyter/
+.matplotlib/
+.mplconfig/
+.mplcache/
+
+# Model checkpoints, serialized objects, and run logs
+*.ckpt
+*.joblib
+*.pkl
+*.pickle
+*.log
+lightning_logs/
+wandb/
+mlruns/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
