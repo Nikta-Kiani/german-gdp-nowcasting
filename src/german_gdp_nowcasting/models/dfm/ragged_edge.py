@@ -103,6 +103,37 @@ def apply_pub_lag_mask(
     return X_masked
 
 
+def freeze_release_block(
+    pub_lag_map: pd.Series,
+    series_ids: list[str] | pd.Index,
+    origin: pd.Period | str,
+    freeze_origin: pd.Period | str,
+) -> pd.Series:
+    """Return publication lags that freeze a series block at an earlier origin.
+
+    Increasing a series' publication lag by the number of months between
+    ``freeze_origin`` and ``origin`` makes its last observed reference month at
+    ``origin`` equal to the one available at ``freeze_origin``. This provides a
+    no-look-ahead counterfactual information set while leaving every other
+    series on its actual release schedule.
+
+    For example, a lag-2 production series observed through November at a
+    January (M1) origin is assigned lag 4 at the March (M3) counterfactual
+    origin, so it remains observed only through November.
+    """
+    origin_p = pd.Period(origin, freq="M")
+    freeze_p = pd.Period(freeze_origin, freq="M")
+    offset = origin_p.ordinal - freeze_p.ordinal
+    if offset < 0:
+        raise ValueError("freeze_origin must not be later than origin")
+
+    adjusted = pub_lag_map.copy().astype(int)
+    for series_id in series_ids:
+        base_lag = int(adjusted.get(series_id, 0))
+        adjusted.loc[series_id] = base_lag + offset
+    return adjusted
+
+
 # ---------------------------------------------------------------------------
 # Stage 2 — Univariate AR(p) BIC fill
 # ---------------------------------------------------------------------------

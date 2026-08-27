@@ -9,6 +9,7 @@ import pandas as pd
 
 from german_gdp_nowcasting.models.dfm.ragged_edge import (
     apply_pub_lag_mask,
+    freeze_release_block,
     last_observed_month,
 )
 from german_gdp_nowcasting.selection.aggregation import (
@@ -58,6 +59,33 @@ class PublicationLagMaskTests(unittest.TestCase):
         )
         self.assertTrue(masked.loc["2020-03-01":, "hard"].isna().all())
         self.assertTrue(masked.loc["2020-05-01":, "unmapped"].isna().all())
+
+    def test_freeze_release_block_reproduces_earlier_information_set(self) -> None:
+        lags = pd.Series({"fast": 0, "hard": 2})
+        adjusted = freeze_release_block(
+            lags,
+            series_ids=["hard"],
+            origin="2020-04",
+            freeze_origin="2020-02",
+        )
+
+        frozen_at_april = apply_pub_lag_mask(self.panel, "2020-04", adjusted)
+        actual_at_february = apply_pub_lag_mask(self.panel, "2020-02", lags)
+        pd.testing.assert_series_equal(
+            frozen_at_april["hard"],
+            actual_at_february["hard"],
+        )
+        self.assertEqual(adjusted["hard"], 4)
+        self.assertEqual(adjusted["fast"], 0)
+
+    def test_freeze_origin_cannot_be_in_the_future(self) -> None:
+        with self.assertRaisesRegex(ValueError, "must not be later"):
+            freeze_release_block(
+                pd.Series({"hard": 2}),
+                series_ids=["hard"],
+                origin="2020-02",
+                freeze_origin="2020-03",
+            )
 
 
 class QuarterlyAggregationTests(unittest.TestCase):

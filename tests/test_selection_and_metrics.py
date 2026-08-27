@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 
 from german_gdp_nowcasting.models.dfm.nowcast_utils import (
+    build_forecast_loss_matrix,
+    compute_model_confidence_set,
     compute_rmsfe,
     compute_rmsfe_by_month_in_quarter,
     diebold_mariano_test,
@@ -113,6 +115,39 @@ class ForecastMetricTests(unittest.TestCase):
         self.assertLessEqual(result["p_value"], 1.0)
         with self.assertRaises(ValueError):
             diebold_mariano_test(np.arange(8), np.arange(8) + 1, loss="unsupported")
+
+    def test_forecast_loss_matrix_aligns_models_on_common_quarters(self) -> None:
+        model_a = self.results
+        model_b = pd.DataFrame({
+            "quarter": ["2020Q1", "2020Q2", "2020Q3"],
+            "month_in_quarter": [3, 3, 3],
+            "error": [2.0, 1.0, 5.0],
+        })
+
+        losses = build_forecast_loss_matrix(
+            {"A": model_a, "B": model_b},
+            month_in_quarter=3,
+            loss="se",
+        )
+
+        self.assertEqual(list(losses.index), ["2020Q1", "2020Q2"])
+        self.assertEqual(losses.loc["2020Q1", "A"], 9.0)
+        self.assertEqual(losses.loc["2020Q1", "B"], 4.0)
+
+    def test_model_confidence_set_eliminates_clearly_inferior_model(self) -> None:
+        rng = np.random.default_rng(42)
+        losses = pd.DataFrame({
+            "good": rng.normal(0.10, 0.01, 200),
+            "bad": rng.normal(1.00, 0.05, 200),
+        })
+
+        result = compute_model_confidence_set(
+            losses, reps=500, block_size=4, seed=42
+        )
+
+        self.assertTrue(result.loc["good", "in_MCS"])
+        self.assertFalse(result.loc["bad", "in_MCS"])
+        self.assertTrue(result["MCS_p_value"].between(0, 1).all())
 
 
 if __name__ == "__main__":

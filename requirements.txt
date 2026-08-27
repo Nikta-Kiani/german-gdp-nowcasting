@@ -6,6 +6,7 @@ pandas==2.3.3
 scipy==1.15.3
 scikit-learn==1.8.0
 statsmodels==0.14.6
+arch==8.0.0
 
 # Machine-learning benchmarks
 xgboost==3.2.0

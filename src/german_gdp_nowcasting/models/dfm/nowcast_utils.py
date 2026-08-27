@@ -5,7 +5,7 @@ Implements the A-CD-TPN DFM pipeline from Franjic & Schweikert (2025):
     CD  = Coordinate Descent (sklearn ElasticNet CV)
     TPN = Targeted Predictor Nowcasting
 
-Also implements evaluation helpers (RMSFE, DM, NSR) shared with XGB/MLP stages.
+Also implements evaluation helpers (RMSFE, DM, MCS, NSR) shared with XGB/MLP stages.
 
 References
 ----------
@@ -1048,6 +1048,81 @@ def align_forecast_errors(
     return ea[mask], eb[mask]
 
 
+def build_forecast_loss_matrix(
+    models: dict[str, pd.DataFrame],
+    eval_start: str | None = None,
+    eval_end: str | None = None,
+    month_in_quarter: int | None = 3,
+    loss: Literal["se", "ae"] = "se",
+) -> pd.DataFrame:
+    """Return common-date forecast losses with quarters as rows and models as columns."""
+    if loss not in {"se", "ae"}:
+        raise ValueError("loss must be 'se' or 'ae'")
+
+    errors: dict[str, pd.Series] = {}
+    for name, df in models.items():
+        sub = _subset_eval_window(
+            df, eval_start, eval_end, month_in_quarter=month_in_quarter
+        )
+        sub = _ensure_quarter_column(sub)[["quarter", "error"]].dropna()
+        if sub["quarter"].duplicated().any():
+            raise ValueError(f"{name} has duplicate observations for a quarter")
+        errors[name] = sub.set_index("quarter")["error"].astype(float)
+
+    if len(errors) < 2:
+        raise ValueError("at least two models are required")
+
+    aligned = pd.concat(errors, axis=1, join="inner").dropna().sort_index()
+    if aligned.empty:
+        raise ValueError("models have no common forecast-error observations")
+    return aligned.pow(2) if loss == "se" else aligned.abs()
+
+
+def compute_model_confidence_set(
+    losses: pd.DataFrame,
+    size: float = 0.10,
+    reps: int = 10_000,
+    block_size: int = 4,
+    seed: int = 42,
+) -> pd.DataFrame:
+    """Compute the Hansen--Lunde--Nason model confidence set.
+
+    Uses the range statistic and a stationary block bootstrap. Models with an
+    elimination p-value greater than ``size`` remain in the confidence set.
+
+    References
+    ----------
+    Hansen, P. R., Lunde, A. & Nason, J. M. (2011). The Model Confidence Set.
+        Econometrica, 79(2), 453--497.
+    """
+    if losses.shape[0] < 8 or losses.shape[1] < 2:
+        raise ValueError("losses must contain at least 8 rows and 2 models")
+    if not 0 < size < 1:
+        raise ValueError("size must lie strictly between 0 and 1")
+
+    from arch.bootstrap import MCS  # pyright: ignore[reportMissingImports]
+
+    mcs = MCS(
+        losses,
+        size=size,
+        reps=reps,
+        block_size=block_size,
+        method="R",
+        bootstrap="stationary",
+        seed=seed,
+    )
+    mcs.compute()
+
+    pvalues = mcs.pvalues["Pvalue"].reindex(losses.columns)
+    result = pd.DataFrame({
+        "mean_loss": losses.mean(),
+        "MCS_p_value": pvalues,
+        "in_MCS": losses.columns.isin(mcs.included),
+    })
+    result.index.name = "model"
+    return result.sort_values("mean_loss")
+
+
 def compute_nsr(
     nowcast_df: pd.DataFrame,
     y_quarterly: pd.Series,
@@ -1116,16 +1191,18 @@ def compute_crps_gaussian(
 
     The Continuous Ranked Probability Score (CRPS) is the proper scoring rule
     for evaluating predictive distributions. For a Gaussian predictive
-    N(μ, σ²) it has the closed-form expression:
+    N(μ, σ²) it has the closed-form expression of Gneiting and Raftery
+    (2007, p. 367):
 
-        CRPS(F, y) = σ · [1/√π − 2φ((y−μ)/σ) − (y−μ)/σ · (2Φ((y−μ)/σ) − 1)]
+        CRPS(F, y) = σ · [z (2Φ(z) − 1) + 2φ(z) − 1/√π],
+        z = (y − μ) / σ,
 
-    where φ and Φ are the standard normal PDF and CDF respectively.
-    The CRPS reduces to MAE when σ → 0 (point forecast), and rewards both
-    sharpness (narrow intervals) and calibration (correct coverage).
+    where φ and Φ are the standard normal PDF and CDF. The score is
+    nonnegative and lower is better; it reduces to absolute error as
+    σ → 0, so the mean CRPS of a degenerate point forecast equals MAE.
 
-    The SV predictive parameters are reconstructed from the stored columns:
-      μ = nowcast  (EM point forecast)
+    The predictive parameters are reconstructed from the stored columns:
+      μ = nowcast (integrated SV can shift the point slightly from EM)
       σ = sigma_em · √(rel_vol)  (SV-scaled Kalman predictive SD)
 
     Parameters
@@ -1170,9 +1247,9 @@ def compute_crps_gaussian(
 
     z    = (y - mu) / sigma
     crps = sigma * (
-        1.0 / np.sqrt(np.pi)
-        - 2.0 * _st.norm.pdf(z)
-        - z * (2.0 * _st.norm.cdf(z) - 1.0)
+        z * (2.0 * _st.norm.cdf(z) - 1.0)
+        + 2.0 * _st.norm.pdf(z)
+        - 1.0 / np.sqrt(np.pi)
     )
     return float(np.mean(crps))
 
@@ -1257,7 +1334,9 @@ def build_interval_calibration_table(
       - mean interval width
       - RMSFE of the point nowcast
 
-    A well-calibrated interval should have empirical coverage ≈ credibility.
+    Full-sample coverage near the nominal level can average severe
+    under-coverage in a shock and over-coverage afterwards; report the
+    three evaluation windows alongside the pooled figure.
 
     Parameters
     ----------

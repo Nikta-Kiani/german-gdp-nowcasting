@@ -7,6 +7,7 @@ Reads saved nowcast CSVs (no model re-runs) and writes:
   - diebold_mariano_table.csv        pairwise DM (full sample)
   - diebold_mariano_table_all_models.csv  headline DM pairs incl. XGB/MLP
   - diebold_mariano_subwindows.csv   pre-COVID / post-COVID DM robustness
+  - model_confidence_set_table.csv   90% MCS for headline models (M3)
   - mincer_zarnowitz_table.csv       bias/efficiency regressions
   - dfm_en_forecast_revision.csv     M1/M2/M3 nowcast evolution
   - figures/thesis_05_dfm_en_revision.png
@@ -45,7 +46,9 @@ else:
 from german_gdp_nowcasting.config import paths as P  # noqa: E402
 from german_gdp_nowcasting.models.dfm.nowcast_utils import (  # noqa: E402
     align_forecast_errors,
+    build_forecast_loss_matrix,
     build_interval_calibration_table,
+    compute_model_confidence_set,
     compute_rmsfe,
     compute_nsr,
     diebold_mariano_test,
@@ -345,6 +348,19 @@ def main() -> None:
             })
     pd.DataFrame(pair_rows).to_csv(P.DM_SUBWINDOW_TABLE_CSV, index=False)
     print(f"Wrote {P.DM_SUBWINDOW_TABLE_CSV.name}")
+
+    losses = build_forecast_loss_matrix(
+        loaded,
+        eval_start=EVAL_START,
+        eval_end=EVAL_END,
+        month_in_quarter=HEADLINE_MIQ,
+        loss="se",
+    )
+    mcs = compute_model_confidence_set(losses)
+    mcs.insert(0, "n", len(losses))
+    mcs.insert(1, "RMSFE", np.sqrt(mcs["mean_loss"]))
+    mcs.to_csv(P.MCS_TABLE_CSV)
+    print(f"Wrote {P.MCS_TABLE_CSV.name}")
 
     mz_tbl = build_mz_table(loaded)
     mz_tbl.to_csv(P.MINCER_ZARNOWITZ_CSV)

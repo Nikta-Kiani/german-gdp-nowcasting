@@ -158,10 +158,21 @@ DM_TABLE_XGB_CSV = OUT_NOWCASTING / "diebold_mariano_table_with_xgb.csv"
 RMSFE_TABLE_ALL_CSV = OUT_NOWCASTING / "rmsfe_table_all_models.csv"
 DM_TABLE_ALL_CSV = OUT_NOWCASTING / "diebold_mariano_table_all_models.csv"
 DM_SUBWINDOW_TABLE_CSV = OUT_NOWCASTING / "diebold_mariano_subwindows.csv"
+MCS_TABLE_CSV = OUT_NOWCASTING / "model_confidence_set_table.csv"
 MINCER_ZARNOWITZ_CSV = OUT_NOWCASTING / "mincer_zarnowitz_table.csv"
 FORECAST_REVISION_CSV = OUT_NOWCASTING / "dfm_en_forecast_revision.csv"
 FORECAST_REVISION_FIG = NOWCAST_FIGURES_DIR / "thesis_05_dfm_en_revision.png"
 SV_INTERVAL_TABLE_CSV = OUT_NOWCASTING / "sv_interval_calibration_table.csv"
+RELEASE_BLOCK_RESULTS_CSV = (
+    OUT_NOWCASTING / "release_block_counterfactual_results.csv"
+)
+RELEASE_BLOCK_STATES_CSV = (
+    OUT_NOWCASTING / "release_block_counterfactual_states.csv"
+)
+RELEASE_BLOCK_DECOMPOSITION_CSV = (
+    OUT_NOWCASTING / "release_block_counterfactual_mean_decomposition.csv"
+)
+RELEASE_BLOCK_FIG = NOWCAST_FIGURES_DIR / "release_block_counterfactual.pdf"
 
 # --- Source Excel (Macrobond / ifo pull) ---
 DATASET_XLSX = _environment_path(

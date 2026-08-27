@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Rerun all indicator-selection matrices under the new raw-level aggregation.
+"""Rerun indicator-selection matrices under the thesis specification.
 
-Reproduces notebooks 03 / 03b / 03c headline calls (EN, fixed-k, PLS,
-frequency-smoothed EN, and the DFM input sets) and overwrites the canonical
-selection artifacts.  GDP target is reused from gdp_target.csv (unchanged).
+Reproduces the notebook 03–05 headline calls (capped EN, fixed-k, PLS,
+frequency-smoothed EN, and the DFM input matrices) and overwrites the
+canonical selection artefacts. GDP target is reused from gdp_target.csv.
 """
 from __future__ import annotations
 
@@ -53,6 +53,7 @@ FORECAST_START, FORECAST_END = "2011-01", "2025-12"
 TRAIN_START = "1991Q1"
 MIN_COVERAGE = 0.30
 IMPUTER = "iterative"
+MAX_SELECTED = 60
 MIN_VOTES = 3
 
 
@@ -73,9 +74,10 @@ def main() -> None:
     en_mat, en_res = run_expanding_selection(
         X_monthly=X_monthly, y_quarterly=y_q, trafo_map=trafo_map,
         forecast_origins=origins, coverage_mask=coverage_mask,
-        train_start_quarter=TRAIN_START, min_selected=1, n_splits=5,
-        imputer_strategy=IMPUTER, tstat_prefilter=True, tstat_threshold=1.65,
-        n_lags=0, sample_weight=sw,
+        train_start_quarter=TRAIN_START, min_selected=1,
+        max_selected=MAX_SELECTED, n_splits=5, imputer_strategy=IMPUTER,
+        tstat_prefilter=True, tstat_threshold=1.65, n_lags=0,
+        sample_weight=sw,
     )
     save_selection_outputs(tp.OUT_INDICATOR_SELECTION, en_mat, en_res)
     print(f"   saved {tp.SELECTION_MATRIX_CSV.name}  {en_mat.shape}", flush=True)

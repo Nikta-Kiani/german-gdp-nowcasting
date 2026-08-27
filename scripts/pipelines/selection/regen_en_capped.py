@@ -5,12 +5,11 @@ Root-cause fix for the post-COVID indicator explosion (n_selected jumping from
 COVID quarters enter the expanding training window, so it retains 100+ weakly
 related series and never recovers.
 
-This script reproduces the headline EN selection of
-``scripts/pipelines/orchestrators/01_selection.py``
-EXACTLY (same panel, imputer, t-stat pre-filter, COVID sample weights), adding
-only a hard upper cap ``MAX_SELECTED`` on the number of indicators per origin
-(Bai & Ng 2008 targeted predictors). Outputs are written to NEW paths so the
-canonical artifacts are left untouched until the results are reviewed.
+This script mirrors the capped headline EN specification in
+``scripts/pipelines/orchestrators/01_selection.py`` (same panel, imputer,
+t-stat pre-filter, COVID sample weights and ``MAX_SELECTED``). It remains a
+non-destructive diagnostic entry point: outputs are written to separate paths
+so they can be compared with the canonical artifacts.
 """
 
 from __future__ import annotations
@@ -54,11 +53,11 @@ from german_gdp_nowcasting.selection.elastic_net_selection import (  # noqa: E40
     run_expanding_selection,
 )
 
-# --- Settings mirror staged 01_selection.py exactly (plus the cap) ----------
+# --- Settings mirror the canonical 01_selection.py EN specification ----------
 FORECAST_START, FORECAST_END = "2011-01", "2025-12"
 TRAIN_START = "1991Q1"
 MIN_COVERAGE = 0.30
-# "iterative" matches the canonical pipeline exactly (promotable output);
+# "iterative" matches the canonical pipeline exactly;
 # "mean" is ~100x faster for a quick cap sanity-check. Override via env var.
 IMPUTER = os.environ.get("REGEN_IMPUTER", "iterative").strip()
 MAX_SELECTED = 60  # hard upper cap on indicators per origin

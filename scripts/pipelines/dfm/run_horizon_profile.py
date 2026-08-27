@@ -43,6 +43,7 @@ MODELS: dict[str, Path] = {
     "DFM-EN": P.actpn_results_csv("en_only"),
     "DFM-SV-k2": P.ACTPN_SV_RESULTS_K2_CSV,
     "DFM-ifoCAST": P.IFO_RESULTS_CSV,
+    "DFM-PLS": P.actpn_results_csv("pls_only"),
     "DFM-BlockBalanced": P.BLOCKBALANCED_RESULTS_CSV,
     "DFM-TVP": P.TVP_RESULTS_CSV,
 }
@@ -51,6 +52,7 @@ MODEL_COLORS: dict[str, str] = {
     "DFM-EN": "#E07D96",
     "DFM-SV-k2": "#3D5FAE",
     "DFM-ifoCAST": "#C9617F",
+    "DFM-PLS": "#CE809C",
     "DFM-BlockBalanced": "#8F3D58",
     "DFM-TVP": "#B07AA1",
 }
