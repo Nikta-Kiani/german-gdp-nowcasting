@@ -18,6 +18,8 @@ Private data can remain elsewhere by setting these environment variables:
     Optional path to the workbook listing retained indicators.
 ``GERMAN_GDP_NOWCASTING_SUPERVISOR_DROPPED_XLSX``
     Optional path to the workbook listing excluded indicators.
+``GERMAN_GDP_NOWCASTING_THESIS_DIR``
+    Optional path to the separate LaTeX thesis repository.
 """
 
 from __future__ import annotations
@@ -55,11 +57,6 @@ def _first_tree(
 
 # paths.py is <repo>/src/german_gdp_nowcasting/config/paths.py.
 REPO_ROOT = Path(__file__).resolve().parents[3]
-
-# Compatibility aliases. DATA and OUTPUTS may resolve to a sibling working
-# copy when the repository trees are empty (see ``_first_tree``).
-ROOT = REPO_ROOT
-PROJECT_FILES = REPO_ROOT
 
 # Sibling trees from the original working copy (not in the public repo).
 _LEGACY_ROOT = REPO_ROOT.parent
@@ -112,13 +109,14 @@ PLS_MATRIX_CSV = OUT_INDICATOR_SELECTION / "selection_matrix_pls.csv"
 BLOCKBALANCED_MATRIX_CSV = (
     OUT_INDICATOR_SELECTION / "selection_matrix_blockbalanced_k20.csv"
 )
-# Fixed-k EN-path benchmark (notebook 03) and frequency-smoothed EN (notebook 03b)
+# Fixed-k EN-path benchmark (notebook 03) and frequency-smoothed EN (notebook 04)
 FIXEDK_MATRIX_CSV = OUT_INDICATOR_SELECTION / "selection_matrix_fixedk.csv"
+FIXEDK_RESULTS_JSON = OUT_INDICATOR_SELECTION / "selection_results_fixedk.json"
 EN_SMOOTHED_MATRIX_CSV = (
     OUT_INDICATOR_SELECTION / "selection_matrix_en_smoothed.csv"
 )
 
-# --- DFM-ready selection matrices (notebook 03c) ---
+# --- DFM-ready selection matrices (notebook 05) ---
 SELECTION_DIR = OUT_INDICATOR_SELECTION / "dfm_input_sets"
 EN_ONLY_MATRIX_CSV = SELECTION_DIR / "en_only_selection_matrix.csv"
 CORE_MATRIX_CSV = SELECTION_DIR / "core_selection_matrix.csv"
@@ -212,6 +210,19 @@ RELEASE_BLOCK_DECOMPOSITION_CSV = (
     OUT_NOWCASTING / "release_block_counterfactual_mean_decomposition.csv"
 )
 RELEASE_BLOCK_FIG = NOWCAST_FIGURES_DIR / "release_block_counterfactual.pdf"
+
+# --- Optional thesis exports ---
+THESIS_DIR = _environment_path(
+    "GERMAN_GDP_NOWCASTING_THESIS_DIR",
+    _first_existing(
+        [
+            REPO_ROOT.parent / "Overleaf-Thesis",
+            REPO_ROOT / "Overleaf-Thesis",
+        ],
+        REPO_ROOT.parent / "Overleaf-Thesis",
+    ),
+)
+THESIS_FIGURES = THESIS_DIR / "figures"
 
 # --- Source Excel (Macrobond / ifo pull) ---
 _DATASET_DEFAULT = REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx"

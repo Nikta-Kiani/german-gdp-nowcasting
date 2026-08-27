@@ -35,8 +35,6 @@ The notebooks document the analysis in order. They load saved CSVs when those fi
 6. `06_dfm_nowcasting.ipynb`
 7. `07_xgboost_nowcasting.ipynb`
 
-If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
-
 Part I selects on completed-quarter aggregates. Publication lags and the ragged edge are applied in Part II, not by dropping series from the selection matrices.
 
 ## Scripted reruns
@@ -53,6 +51,8 @@ python scripts/pipelines/orchestrators/09_finalize.py
 ```
 
 These commands refit expanding-window models over 2011–2025 and write to `outputs/`, which Git ignores.
+The DFM suite includes the ifoCAST, stochastic-volatility, block-balanced,
+equal-weight-combination, and TVP benchmarks required by the final tables.
 
 The post-COVID DFM-EN release-block attribution reuses the saved observed path and refits only the two hybrid information sets (hard activity frozen; non-hard complement frozen):
 

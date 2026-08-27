@@ -29,7 +29,6 @@ from german_gdp_nowcasting.config import paths as tp  # noqa: E402
 from german_gdp_nowcasting.selection.core_utils import (  # noqa: E402
     build_coverage_mask,
     load_monthly_panel,
-    load_pub_lag_map,
     load_trafo_map,
     make_monthly_forecast_origins,
     save_selection_outputs,
@@ -62,7 +61,6 @@ def main() -> None:
     t0 = time.perf_counter()
     X_monthly = load_monthly_panel(tp.PANEL_TRANSFORMED_CSV)
     trafo_map = load_trafo_map(tp.DATA_DICT_ENRICHED_CSV)
-    pub_lag_map = load_pub_lag_map(tp.PUB_LAG_CSV)
     y_q = pd.read_csv(tp.GDP_TARGET_CSV, index_col=0).iloc[:, 0]
     y_q.index = pd.PeriodIndex(y_q.index, freq="Q")
 
@@ -122,8 +120,7 @@ def main() -> None:
         "fixed-k (k=30)": fk_mat.astype(int),
     }
     sets = build_dfm_input_sets(
-        matrices=matrices, meta=meta, coverage_mask=coverage_mask,
-        pub_lag_map=pub_lag_map, min_votes=MIN_VOTES,
+        matrices=matrices, meta=meta, min_votes=MIN_VOTES,
         en_label="EN raw", pls_label="PLS",
     )
     sets.pop("_rate_table_diagnostic", None)

@@ -16,8 +16,9 @@ The preparation notebooks expect:
 - a source workbook named `ifoCAST_DATA.xlsx`;
 - sheets containing the raw monthly panel, transformation metadata, and
   first-release GDP vintages;
-- optional review workbooks used to document publication lags and approved
-  indicator changes.
+- `data/metadata/pub_lag_map.csv`, containing `id` and `pub_lag`;
+- optional review workbooks documenting approved indicator changes. Notebook
+  02 can infer the approved additions from the lag map when these are absent.
 
 Later pipeline stages consume files produced by the preparation notebooks:
 

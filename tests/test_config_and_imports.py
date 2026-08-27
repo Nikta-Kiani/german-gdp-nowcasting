@@ -22,6 +22,7 @@ PATH_ENV_VARS = (
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_EXPORTS_DIR",
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_KEPT_XLSX",
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_DROPPED_XLSX",
+    "GERMAN_GDP_NOWCASTING_THESIS_DIR",
 )
 
 # These modules deliberately depend on optional, computationally heavy extras.
@@ -40,15 +41,15 @@ class ConfigPathTests(unittest.TestCase):
         """Leave the shared paths module in its normal process environment."""
         importlib.reload(paths)
 
-    def test_default_paths_use_clean_repository_layout(self) -> None:
+    def test_default_paths_resolve_expected_layout(self) -> None:
         with mock.patch.dict(os.environ, {name: "" for name in PATH_ENV_VARS}):
             importlib.reload(paths)
 
             self.assertEqual(paths.REPO_ROOT, REPO_ROOT)
-            self.assertEqual(paths.ROOT, REPO_ROOT)
-            self.assertEqual(paths.PROJECT_FILES, REPO_ROOT)
             self.assertEqual(paths.DATA.name, "data")
             self.assertEqual(paths.OUTPUTS.name, "outputs")
+            self.assertEqual(paths.NOTEBOOK_FIGURES, paths.OUTPUTS / "notebooks")
+            self.assertEqual(paths.THESIS_FIGURES, paths.THESIS_DIR / "figures")
             repo_dataset = (REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx").resolve()
             sibling_dataset = (
                 REPO_ROOT.parent / "Dataset" / "ifoCAST_DATA.xlsx"
@@ -90,6 +91,9 @@ class ConfigPathTests(unittest.TestCase):
             "GERMAN_GDP_NOWCASTING_SUPERVISOR_DROPPED_XLSX": str(
                 REPO_ROOT / "tests" / "dropped_override.xlsx"
             ),
+            "GERMAN_GDP_NOWCASTING_THESIS_DIR": str(
+                REPO_ROOT / "tests" / "thesis_override"
+            ),
         }
         with mock.patch.dict(os.environ, overrides):
             importlib.reload(paths)
@@ -119,6 +123,10 @@ class ConfigPathTests(unittest.TestCase):
             self.assertEqual(
                 paths.SUPERVISOR_DROPPED_XLSX,
                 Path(overrides[PATH_ENV_VARS[5]]).resolve(),
+            )
+            self.assertEqual(
+                paths.THESIS_DIR,
+                Path(overrides[PATH_ENV_VARS[6]]).resolve(),
             )
 
 

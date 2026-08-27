@@ -1,7 +1,7 @@
 # German GDP nowcasting
 
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-24%20synthetic-brightgreen)](#tests)
+[![Tests](https://img.shields.io/badge/tests-synthetic-brightgreen)](#tests)
 [![Data](https://img.shields.io/badge/data-licensed%20%7C%20not%20included-lightgrey)](docs/DATA.md)
 
 Code accompanying the master's thesis
@@ -63,7 +63,7 @@ german-gdp-nowcasting/
 └── requirements.txt
 ```
 
-The Streamlit dashboard and the LaTeX thesis are kept separately. Licensed data and generated outputs are not in this repository.
+The Streamlit dashboard and the LaTeX thesis are kept separately. Licensed data and generated outputs are not in this repository. Curated dashboard outputs are published from the private data-only repository [`german-gdp-nowcast-real-data`](https://github.com/Nikta-Kiani/german-gdp-nowcast-real-data).
 
 ## Quick start
 
@@ -83,7 +83,7 @@ python -m pip install -e ".[full]"
 jupyter lab notebooks/
 ```
 
-The notebooks document the analysis in reading order. Restart the kernel after a path change so `german_gdp_nowcasting.config.paths` is re-imported. They load saved CSVs when those files exist; they do not re-fit the 60-quarter backtests unless a `FORCE_RERUN` flag is set. If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
+The notebooks document the analysis in reading order and reuse saved model outputs by default. Restart the kernel after changing path settings.
 
 ## Data
 
@@ -116,7 +116,11 @@ The post-COVID DFM-EN release-block counterfactual is a separate experiment:
 python scripts/pipelines/dfm/run_release_block_counterfactual.py
 ```
 
-Full reruns are expensive and write only to the ignored `outputs/` directory. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
+Full reruns are expensive and write only to the configured outputs directory. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
+
+To refresh the live dashboard, stage the generated files with
+`german-gdp-nowcast-dashboard/scripts/stage_real_data.py --source <pipeline-root>`
+and publish that directory to the private companion repository.
 
 ## Tests
 
@@ -126,7 +130,7 @@ The suite uses synthetic panels and does not read or overwrite thesis data:
 python -m unittest discover -s tests -t .
 ```
 
-Twenty-four tests cover imports, path configuration, publication lags, the release-block freeze, quarterly aggregation, selection smoothing, RMSFE / Diebold–Mariano helpers, the model confidence set, and no-look-ahead feature construction.
+The tests cover imports, path configuration, publication lags, the release-block freeze, quarterly aggregation, selection smoothing, RMSFE / Diebold–Mariano helpers, the model confidence set, and no-look-ahead feature construction.
 
 ## Limits of the public code
 

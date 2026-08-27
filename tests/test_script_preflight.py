@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import re
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from german_gdp_nowcasting.config import paths
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "scripts"
+NOTEBOOKS_DIR = REPO_ROOT / "notebooks"
 
 
 def _is_main_guard(node: ast.AST) -> bool:
@@ -53,6 +55,13 @@ class ScriptPreflightTests(unittest.TestCase):
             paths.EN_ONLY_MATRIX_CSV.parent,
             paths.OUT_INDICATOR_SELECTION / "dfm_input_sets",
         )
+
+    def test_notebook_path_constants_exist(self) -> None:
+        for notebook in sorted(NOTEBOOKS_DIR.glob("*.ipynb")):
+            names = set(re.findall(r"_tp\.([A-Z][A-Z0-9_]*)", notebook.read_text()))
+            with self.subTest(notebook=notebook.name):
+                missing = sorted(name for name in names if not hasattr(paths, name))
+                self.assertEqual(missing, [])
 
 
 if __name__ == "__main__":

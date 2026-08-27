@@ -70,6 +70,7 @@ REGIMES: dict[str, tuple[str, str]] = {
 HEADLINE_MODELS: dict[str, Path | None] = {
     "DFM-ifoCAST": P.IFO_RESULTS_CSV,
     "DFM-EN": P.actpn_results_csv("en_only"),
+    "DFM-PLS": P.actpn_results_csv("pls_only"),
     "DFM-BlockBalanced": P.BLOCKBALANCED_RESULTS_CSV,
     "DFM-TVP": P.TVP_RESULTS_CSV,
     "DFM-SV-k2": P.ACTPN_SV_RESULTS_K2_CSV,
@@ -82,6 +83,7 @@ HEADLINE_MODELS: dict[str, Path | None] = {
 
 DFM_TABLE_MODELS: dict[str, Path | None] = {
     "DFM-EN": P.actpn_results_csv("en_only"),
+    "DFM-PLS": P.actpn_results_csv("pls_only"),
     "DFM-ifoCAST": P.IFO_RESULTS_CSV,
     "DFM-BlockBalanced": P.BLOCKBALANCED_RESULTS_CSV,
     "DFM-SV-k2": P.ACTPN_SV_RESULTS_K2_CSV,

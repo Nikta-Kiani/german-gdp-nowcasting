@@ -233,12 +233,12 @@ def _regime_rmsfe_table(
     month_in_quarter: int | None = 3,
 ) -> pd.DataFrame:
     """Pivot table: regimes × models (RMSFE values)."""
-    from ..models.dfm.nowcast_utils import _subset_eval_window
+    from ..models.dfm.nowcast_utils import subset_eval_window
 
     rows: list[dict] = []
     for model, df in results_by_model.items():
         for label, (q0, q1) in regimes.items():
-            sub = _subset_eval_window(
+            sub = subset_eval_window(
                 df, eval_start=q0, eval_end=q1, month_in_quarter=month_in_quarter,
             )
             errs = sub["error"].dropna()

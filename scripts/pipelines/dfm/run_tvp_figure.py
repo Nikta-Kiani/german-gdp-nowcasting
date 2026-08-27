@@ -30,7 +30,7 @@ else:
 
 from german_gdp_nowcasting.config import paths as P  # noqa: E402
 
-THESIS_FIG = P.ROOT / "Overleaf-Thesis" / "figures" / "07_tvp_loading_drift.png"
+THESIS_FIG = P.THESIS_FIGURES / "07_tvp_loading_drift.png"
 DASH_FIG = P.NOWCAST_FIGURES_DIR / "07_tvp_loading_drift.png"
 
 LOADING_COLORS = ["#B07AA1", "#6E92B4"]

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rerun DFM-EN nowcasts (en_only / core / pls_only) + AR1/RW baselines + tables.
 
-Mirrors notebook 04 headline calls. DFM consumes the monthly transformed panel
+Mirrors notebook 06 headline calls. DFM consumes the monthly transformed panel
 (unchanged) but the EN-derived selection matrices changed under the new
 aggregation, so all EN/PLS/core DFM nowcasts are regenerated.
 """
@@ -77,7 +77,7 @@ def main() -> None:
     ar1.to_csv(tp.AR1_RESULTS_CSV)
     rw.to_csv(tp.RW_RESULTS_CSV)
 
-    # Headline RMSFE + DM tables (DFM-EN reference), matching notebook 04.
+    # Headline RMSFE + DM tables (DFM-EN reference), matching notebook 06.
     print("[tables] rmsfe / DM ...", flush=True)
     tbl_models = {
         "DFM-EN": results["DFM-en_only"],

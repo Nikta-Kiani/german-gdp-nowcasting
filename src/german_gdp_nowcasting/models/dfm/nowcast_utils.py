@@ -824,7 +824,7 @@ def mincer_zarnowitz_test(
     Returns OLS coefficients, standard errors, and joint Wald p-value for
     H0: alpha = 0 and beta = 1 (forecast rationality under quadratic loss).
     """
-    sub = _subset_eval_window(
+    sub = subset_eval_window(
         nowcast_df, eval_start, eval_end, month_in_quarter=month_in_quarter
     )
     sub = sub.dropna(subset=["nowcast", "actual"])
@@ -895,7 +895,7 @@ def eigenvalue_ratio_er(X_scaled: np.ndarray, max_k: int = 8) -> int:
 # Evaluation metrics
 # ---------------------------------------------------------------------------
 
-def _subset_eval_window(
+def subset_eval_window(
     nowcast_df: pd.DataFrame,
     eval_start: str | None = None,
     eval_end: str | None = None,
@@ -937,7 +937,7 @@ def compute_rmsfe(
         (end-of-quarter information set). If ``None``, all monthly origins in
         the DataFrame are pooled (180 errors when M1--M3 are present).
     """
-    sub = _subset_eval_window(
+    sub = subset_eval_window(
         nowcast_df, eval_start, eval_end, month_in_quarter
     )
     errors = sub["error"].dropna()
@@ -1027,10 +1027,10 @@ def align_forecast_errors(
     requested ``month_in_quarter``). This avoids accidental row-order alignment
     when DFM DataFrames carry duplicate quarter index labels (M1/M2/M3).
     """
-    a = _subset_eval_window(
+    a = subset_eval_window(
         df_a, eval_start, eval_end, month_in_quarter=month_in_quarter
     )
-    b = _subset_eval_window(
+    b = subset_eval_window(
         df_b, eval_start, eval_end, month_in_quarter=month_in_quarter
     )
     a = _ensure_quarter_column(a)
@@ -1061,7 +1061,7 @@ def build_forecast_loss_matrix(
 
     errors: dict[str, pd.Series] = {}
     for name, df in models.items():
-        sub = _subset_eval_window(
+        sub = subset_eval_window(
             df, eval_start, eval_end, month_in_quarter=month_in_quarter
         )
         sub = _ensure_quarter_column(sub)[["quarter", "error"]].dropna()
@@ -1167,7 +1167,7 @@ def compute_nsr(
     if np.isnan(rmsfe):
         return np.nan
 
-    sub = _subset_eval_window(
+    sub = subset_eval_window(
         nowcast_df, eval_start, eval_end, month_in_quarter=miq
     )
     actuals = sub["actual"].dropna()
@@ -1358,7 +1358,7 @@ def build_interval_calibration_table(
 
     rows = []
     for name, df in sv_results.items():
-        sub = _subset_eval_window(
+        sub = subset_eval_window(
             df,
             eval_start=eval_start,
             eval_end=eval_end,

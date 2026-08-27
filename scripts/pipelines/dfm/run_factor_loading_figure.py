@@ -71,9 +71,9 @@ FACTOR_LABELS = [
 ]
 
 CACHE_CSV = P.OUT_NOWCASTING / "factor_loading_m3_panel.csv"
-THESIS_CAT = P.ROOT / "Overleaf-Thesis" / "figures" / "08_factor_loading_categories.png"
-THESIS_SNAP = P.ROOT / "Overleaf-Thesis" / "figures" / "08_factor_loading_snapshot.png"
-THESIS_INT = P.ROOT / "Overleaf-Thesis" / "figures" / "08_factor_interpretation_integrated.png"
+THESIS_CAT = P.THESIS_FIGURES / "08_factor_loading_categories.png"
+THESIS_SNAP = P.THESIS_FIGURES / "08_factor_loading_snapshot.png"
+THESIS_INT = P.THESIS_FIGURES / "08_factor_interpretation_integrated.png"
 DASH_CAT = P.NOWCAST_FIGURES_DIR / "08_factor_loading_categories.png"
 DASH_SNAP = P.NOWCAST_FIGURES_DIR / "08_factor_loading_snapshot.png"
 DASH_INT = P.NOWCAST_FIGURES_DIR / "08_factor_interpretation_integrated.png"

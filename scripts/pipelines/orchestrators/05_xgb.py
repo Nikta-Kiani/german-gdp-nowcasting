@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rerun XGBoost nowcasts (retune + full SHAP-pruned loop) under new aggregation.
 
-Mirrors notebook 05 headline calls. The quarterly feature aggregation changed
+Mirrors notebook 07 headline calls. The quarterly feature aggregation changed
 (raw-level bridge), so both tuning and the 60-origin loop are regenerated.
 """
 from __future__ import annotations

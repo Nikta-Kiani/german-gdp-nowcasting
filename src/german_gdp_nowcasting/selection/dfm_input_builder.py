@@ -269,8 +269,6 @@ def apply_release_filter(
 def build_dfm_input_sets(
     matrices: Mapping[str, pd.DataFrame],
     meta: pd.DataFrame,
-    coverage_mask: pd.DataFrame,
-    pub_lag_map: pd.Series,
     min_votes: int = 3,
     en_label: str = "EN raw",
     pls_label: str = "PLS",
@@ -282,9 +280,6 @@ def build_dfm_input_sets(
     * ``core``    - >=``min_votes`` consensus (no matrix-level release filter).
     * ``en_only`` - raw EN selection matrix.
     * ``pls_only``- raw PLS+VIP matrix.
-
-    ``pub_lag_map`` is accepted for API compatibility (e.g. optional top-up)
-    but is not applied here; Part~II nowcasting uses it via ``ragged_edge``.
 
     Additional diagnostic keys
     --------------------------

@@ -20,12 +20,12 @@ import numpy as np
 import pandas as pd
 
 from ..config import paths as _tp
-from ..models.dfm.nowcast_utils import _subset_eval_window
+from ..models.dfm.nowcast_utils import subset_eval_window
 from . import xgb_plots as xp
 from .nowcast_plots import _apply_year_axis, _q_to_ts, add_recession_bands
 
 FIG = _tp.NOWCAST_FIGURES_DIR
-OVERLEAF_FIG = _tp.ROOT / "Overleaf-Thesis" / "figures"
+OVERLEAF_FIG = _tp.THESIS_FIGURES
 
 REGIMES: dict[str, tuple[str, str]] = {
     "pre-COVID":  ("2011Q1", "2019Q4"),
@@ -116,7 +116,7 @@ def _regime_rmsfe(
             continue
         df = results[m]
         for label, (q0, q1) in regimes.items():
-            sub = _subset_eval_window(
+            sub = subset_eval_window(
                 df, eval_start=q0, eval_end=q1, month_in_quarter=miq,
             )
             errs = sub["error"].dropna()

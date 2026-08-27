@@ -3,7 +3,7 @@
 
 Read-only over the regenerated nowcast CSVs (except the contribution cache,
 which is rebuilt with --rebuild-contrib). Run only after ALL nowcasts exist
-(DFM-EN/core/pls, SV, block-balanced, combo, XGB, MLP-Factor).
+(DFM-EN/core/PLS, ifoCAST, TVP, SV, block-balanced, combo, XGB, MLP-Factor).
 """
 from __future__ import annotations
 

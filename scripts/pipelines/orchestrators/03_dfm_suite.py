@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Wave 2b: DFM benchmark variants affected by the new aggregation/selection.
+"""Run the complete DFM benchmark suite.
 
-Runs sequentially (all CPU-heavy DFM/EN loops):
-  1. rerun_sv_integrated.py      -> nowcast_results_actpn_sv_integrated_k2.csv
-  2. run_blockbalanced_benchmark.py -> blockbalanced results + rmsfe
-  3. run_ifocast_regime_combo.py -> nowcast_path_combo_equal.csv
-
-ifoCAST itself is NOT rerun (fixed indicator set, monthly DFM -> unaffected by
-the quarterly aggregation change).
+Runs sequentially (all CPU-heavy):
+  1. run_ifocast_benchmark.py       -> fixed ifoCAST benchmark
+  2. rerun_sv_integrated.py         -> integrated stochastic-volatility DFM
+  3. run_blockbalanced_benchmark.py -> block-balanced benchmark
+  4. run_ifocast_regime_combo.py    -> equal-weight combination
+  5. run_tvp_benchmark.py           -> time-varying-parameter benchmark
 """
 from __future__ import annotations
 
@@ -19,9 +18,11 @@ from pathlib import Path
 PY = sys.executable
 DFM = Path(__file__).resolve().parent.parent / "dfm"
 SCRIPTS = [
+    "run_ifocast_benchmark.py",
     "rerun_sv_integrated.py",
     "run_blockbalanced_benchmark.py",
     "run_ifocast_regime_combo.py",
+    "run_tvp_benchmark.py",
 ]
 
 
