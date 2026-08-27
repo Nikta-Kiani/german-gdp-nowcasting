@@ -35,7 +35,7 @@ The notebooks document the analysis in order. They load saved CSVs when those fi
 6. `06_dfm_nowcasting.ipynb`
 7. `07_xgboost_nowcasting.ipynb`
 
-Some stored cell outputs predate the 60-series elastic-net cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`, rather than printed RMSFE from an older notebook run.
+If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
 
 Part I selects on completed-quarter aggregates. Publication lags and the ragged edge are applied in Part II, not by dropping series from the selection matrices.
 

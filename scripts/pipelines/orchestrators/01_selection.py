@@ -119,7 +119,7 @@ def main() -> None:
         "EN raw": en_mat.astype(int),
         "EN smoothed": en_smoothed.astype(int),
         "PLS": pls_mat.astype(int),
-        "block-balanced (k=20)": fk_mat.astype(int),
+        "fixed-k (k=30)": fk_mat.astype(int),
     }
     sets = build_dfm_input_sets(
         matrices=matrices, meta=meta, coverage_mask=coverage_mask,

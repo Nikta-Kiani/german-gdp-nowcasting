@@ -83,7 +83,7 @@ python -m pip install -e ".[full]"
 jupyter lab notebooks/
 ```
 
-The notebooks document the analysis. They load saved results when those files exist; they do not re-fit the 60-quarter backtests unless a `FORCE_RERUN` flag is set. Some stored cell outputs predate the 60-series elastic-net cap. The numbers in the thesis tables — and those produced by `scripts/pipelines/dfm/build_unified_evaluation.py` — are the ones to cite.
+The notebooks document the analysis in reading order. They load saved CSVs when those files exist; they do not re-fit the 60-quarter backtests unless a `FORCE_RERUN` flag is set. If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
 
 ## Data
 
