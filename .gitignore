@@ -17,6 +17,9 @@ Overleaf-Thesis/
 _archive*/
 *backup*/
 
+# PNG previews written by scripts/thesis/export_thesis_figures.py
+scripts/thesis/figure_previews/
+
 # Secrets and local configuration
 .env
 .env.*
@@ -28,7 +31,7 @@ _archive*/
 .venv/
 venv/
 env/
-thesis/
+/thesis/
 build/
 dist/
 *.egg-info/

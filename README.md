@@ -57,6 +57,7 @@ german-gdp-nowcasting/
 │   ├── models/dfm|xgboost|mlp
 │   └── visualization/
 ├── scripts/pipelines/         # Full reruns (selection, DFM suite, XGB, figures)
+├── scripts/thesis/            # Compile the stored cut into thesis tables/figures
 ├── tests/                     # Synthetic tests; no private data
 ├── docs/                      # Data access, reproducibility, figures
 ├── pyproject.toml

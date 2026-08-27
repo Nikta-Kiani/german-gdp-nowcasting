@@ -62,6 +62,17 @@ python scripts/pipelines/dfm/run_release_block_counterfactual.py
 
 It writes the four-state forecast paths, quarter-level and mean Shapley loss decompositions, and the PDF figure under `outputs/nowcasting/`. The experiment is a fitted-model accounting identity for 2022Q1–2025Q4 ($N=16$). It does not show that official hard releases are generally harmful; bootstrap intervals for the hard-block contribution include zero.
 
+## Thesis tables and figures
+
+The printed tables and vector figures are compiled from the stored result cut. They do not re-estimate models:
+
+```bash
+python scripts/thesis/generate_thesis_tables.py
+python scripts/thesis/export_thesis_figures.py
+```
+
+Both scripts import the companion dashboard (`german-gdp-nowcast-dashboard`) for data access and chart builders, and they write into a sibling `Overleaf-Thesis/` directory. Set `DASHBOARD_SRC` and `THESIS_ROOT` if that layout differs.
+
 ## Real-time protocol
 
 - Expanding training windows; the target quarter never enters estimation.
