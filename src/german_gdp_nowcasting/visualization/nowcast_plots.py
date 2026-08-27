@@ -351,8 +351,9 @@ def fig_rmsfe_bar(
 
     Models are sorted best (lowest) at top to worst at bottom.
     A dashed vertical line marks the AR(1) benchmark. Labels appended
-    with * denote models that significantly outperform AR(1) at
-    ``alpha`` (Diebold-Mariano, HLN correction).
+    with * denote models for which the HLN-corrected Diebold–Mariano
+    test rejects equal squared-error accuracy versus the expanding AR(1)
+    at ``alpha``. Over the thesis full sample no model rejects.
 
     A solid vertical line at ``nsr_threshold`` (std of GDP actuals) marks the
     practical-relevance threshold from Lehmann et al. (2020): models to the
@@ -419,8 +420,9 @@ def fig_rmsfe_bar(
     footnotes = []
     if dm_pvals_vs_ar1 is not None:
         footnotes.append(
-            f"*  Significantly outperforms AR(1) at the {int(alpha*100)}% level"
-            " (Diebold-Mariano, HLN small-sample correction)."
+            f"*  HLN-corrected Diebold–Mariano test rejects equal squared-error"
+            f" accuracy versus the expanding AR(1) at the {int(alpha*100)}% level."
+            " Over the thesis full sample (2011Q1–2025Q4) no model rejects."
         )
     if nsr_threshold is not None:
         footnotes.append(
@@ -577,13 +579,13 @@ def fig_sv_calibration(
         inside = float((np.abs(err) <= z * sigma_pred).mean())
         empirical.append(inside)
 
-        # CRPS for Gaussian N(mu, sigma_pred^2) — closed form (Gneiting & Raftery 2007)
+        # CRPS for Gaussian N(mu, sigma_pred^2) — Gneiting & Raftery (2007)
         z_std = err / np.clip(sigma_pred, 1e-10, None)
         crps_i = float(np.mean(
             sigma_pred * (
-                1.0 / np.sqrt(np.pi)
-                - 2.0 * _st.norm.pdf(z_std)
-                - z_std * (2.0 * _st.norm.cdf(z_std) - 1.0)
+                z_std * (2.0 * _st.norm.cdf(z_std) - 1.0)
+                + 2.0 * _st.norm.pdf(z_std)
+                - 1.0 / np.sqrt(np.pi)
             )
         ))
         crps_vals.append(crps_i)
@@ -696,24 +698,22 @@ def fig_nowcast_fan(
     credibility: float = 0.90,
     save: str | Path | None = None,
 ) -> plt.Figure:
-    """ifoCAST-style fan chart: Core DFM nowcast with a time-varying SV interval.
+    """Fan chart: integrated DFM-SV nowcast with a time-varying interval.
 
-    The shaded band is the ``credibility``-level prediction interval
-    produced by the Bayesian SV layer (columns ``ci_lower_90`` /
-    ``ci_upper_90`` in ``sv_df``). Because the interval width is driven
-    by the time-varying log-volatility multiplier :math:`r_t`, it widens
-    endogenously during turbulent periods (COVID 2020, GFC 2008-09) and
-    narrows during stable expansions -- matching the behaviour shown in
-    Lehmann, Reif & Wollmershäuser (2020, *IfoCast*).
+    The shaded band is the ``credibility``-level prediction interval from
+    the integrated SV specification (``ci_lower_90`` / ``ci_upper_90``).
+    Width tracks the estimated volatility state: it widens in 2020 and
+    narrows only partly after 2022. Full-sample 90% coverage is 88.3%
+    (53/60); six of seven misses fall in the eight pandemic quarters.
 
     Parameters
     ----------
     sv_df:
-        DataFrame produced by the SV nowcasting loop. Expected columns:
-        ``nowcast``, ``actual``, ``ci_lower_<cov>``, ``ci_upper_<cov>``,
-        ``rel_vol``. Index is quarterly (string period labels).
+        DataFrame produced by the integrated SV nowcasting loop. Expected
+        columns: ``nowcast``, ``actual``, ``ci_lower_<cov>``,
+        ``ci_upper_<cov>``, ``rel_vol``. Index is quarterly.
     credibility:
-        Nominal coverage of the shaded interval (default 0.90 = 90 %).
+        Nominal coverage of the shaded interval (default 0.90).
     """
     cov_label = int(round(credibility * 100))
     lo_col = f"ci_lower_{cov_label}"
@@ -765,8 +765,8 @@ def fig_nowcast_fan(
     ax.set_ylabel("Quarter-on-Quarter Log-Growth (pp)")
     ax.set_xlabel("Quarter")
     ax.set_title(
-        f"Core DFM Nowcast of German GDP Growth with {cov_label}% "
-        "Time-Varying Prediction Interval",
+        f"Integrated DFM-SV nowcast of German GDP growth with {cov_label}% "
+        "prediction interval",
         fontsize=12,
     )
     ax.legend(loc="lower left", framealpha=0.9, fontsize=8.5)

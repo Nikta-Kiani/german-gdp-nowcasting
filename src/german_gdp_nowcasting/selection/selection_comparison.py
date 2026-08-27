@@ -980,7 +980,7 @@ def plot_task3_soft_hard(
     ax.set_ylabel("soft (survey) mass share")
     ax.set_ylim(0, 1)
     ax.axhline(0.5, color="#9aa0a6", lw=0.8, ls="--")
-    ax.set_title("Soft-data dominance by regime (share of survey mass)", pad=34)
+    ax.set_title("Survey mass share by regime (universe survey share is 0.67)", pad=34)
     ax.legend(ncol=3, loc="lower center", bbox_to_anchor=(0.5, 1.01), frameon=False)
     fig.tight_layout()
     save_fig(fig, out_path)
@@ -993,60 +993,61 @@ def plot_task3_soft_hard(
 # =============================================================================
 
 INTERPRETATION_GUIDE = """\
-# Interpreting the cross-model selection diagnostics
+# Reading the cross-method selection diagnostics
 
-## The common currency: *category mass share*
-Every model exposes a different native signal (binary inclusion for EN/PLS/
-Fixed-k, |SHAP| for XGBoost). We map all of them onto
-one dimensionless quantity — the **share of a model's total selection mass that
-goes to each economic category** (Surveys, Production, Orders, ...). Because the
-shares sum to one, a *rise* in one category is mechanically a *fall* elsewhere:
-read the panels as a **reallocation of attention**, not as absolute importance.
+These figures support Part I of the thesis. They do not identify a unique
+German nowcasting set.
 
-## Task 1 — Structural shift through time (stacked areas)
-- A widening **rose band (Surveys / soft data)** that crowds out the **green/blue
-  real-activity bands (Production, Orders, Turnover, Trade)** is the signature of
-  models leaning on *expectational* information. This typically happens (i) around
-  **turning points**, when surveys (Ifo, ZEW, PMI) lead realised activity, and
-  (ii) at the **ragged edge**, where hard data are not yet published.
-- **Publication lag is a confound, not noise.** Hard real-activity series carry
-  pub-lag 1–2 months, so at short horizons they are simply *unavailable* in real
-  time; a soft-data tilt can therefore reflect the *information set* rather than a
-  judgement that surveys are more informative. Cross-check the soft tilt against
-  `pub_lag` before claiming an economic preference.
-- EN-raw vs EN-smoothed shows how much of the month-to-month churn is genuine
-  signal vs estimation noise; the smoothed panel is the more credible narrative.
+## Common scale: category mass share
+Each method has a native signal (binary inclusion for EN / PLS / block-balanced;
+mean |SHAP| for XGBoost). All of them are mapped onto the share of that method's
+own selected mass in each economic category. Shares sum to one within a method,
+so a rise in one category is a fall elsewhere. Compare mix, not absolute
+importance, across methods.
 
-## Task 2 — Cross-model consensus
-- **Spearman ρ** measures whether methods *rank the whole universe* similarly.
-  High ρ between EN and PLS is expected (both are linear shrinkage/projection);
-  lower ρ against XGBoost indicates the non-linear model exploits a different,
-  possibly interaction-driven, subset.
-- The **consensus heatmap** isolates the union of each method's top indicators.
-  Horizontal bands that are bright across *all* columns are the robust German
-  "core" — typically **Ifo business-climate components and industrial-production
-  aggregates**. Indicators bright in only one column are method-specific and
-  should be treated with caution in a thesis narrative.
+## What the thesis finds
+- **Category tilt.** Every data-driven method places 65–100% of selected mass on
+  delayed hard activity (production, turnover, orders, trade, construction)
+  against a 29% universe share, and under-weights lag-0 series relative to the
+  panel's 70% lag-0 share. That rejects a soft-data-dominance reading of this
+  completed-quarter selection problem.
+- **Series disagreement.** Spearman rank correlations among the four methods are
+  0.28–0.43. Only two series are selected by the elastic net at every origin.
+  Mean Jaccard overlap with the frozen ifoCAST set is 0.11. Agreement is about
+  *kind* of data, not about a shared list.
+- **COVID rotation is estimator-sensitive.** The pooled EN survey share rises
+  during COVID, but three of sixty refits carry it and it reverses quickly.
+  XGBoost moves the other way (survey share falls as production importance
+  rises). Do not read a method-independent shift towards sentiment.
 
-## Task 3 — Regime switching (COVID vs normal)
-- **2020–2021 (COVID):** a synchronised collapse compresses cross-sectional
-  information into a few fast, forward-looking series. Expect the **soft share to
-  jump** and real-activity blocks to thin out — partly genuine (surveys captured
-  the shock first) and partly mechanical (hard data were delayed/volatile).
-- **2022–2025 (post-COVID):** the inflation / normalisation phase should rotate
-  attention back toward **hard real activity and, where present, Prices**, as the
-  binding macro question shifts from "how deep is the shock" to "how fast does
-  output and inflation normalise".
-- The **soft-vs-hard summary** is the one-line test of the headline hypothesis:
-  if the survey share rises in COVID and recedes afterwards across *several*
-  models, the rotation is a robust structural feature, not an artefact of one
-  estimator.
+## Task 1 — category mix through time
+Read the stacked areas for the *level* of concentration first, then for
+movement. Turnover, orders and production dominate every panel. Isolated survey
+spikes on the EN path are substitutions under the 60-series cap, not a new
+regime. Part I scores completed-quarter association, so publication timing
+confers no advantage; surveys can still matter in Part II before hard releases
+arrive.
 
-## Reading rules of thumb
-1. Trust a narrative only when it appears in **≥2 model families**.
-2. Always separate *availability* (publication lag) from *informativeness*.
-3. Shares are relative — annotate with absolute mass (e.g. total |SHAP|) when the
-   level matters.
+## Task 2 — cross-method ranks
+Spearman ρ is computed over the union of ever-weighted series, with absent
+weights set to zero. Modest ρ is the expected result when many collinear
+indicators measure the same activity block. Bright cells in only one column of
+the consensus heatmap are method-specific stand-ins for that block, not a
+reason to drop the category.
+
+## Task 3 — regime bars
+Hard-activity majorities in every window are the finding. A COVID rise in
+survey mass that appears in one method and not in the others is not a
+structural shift. PLS remains essentially 100% hard in every window.
+
+## Rules of thumb
+1. Cite a category pattern only when it appears in more than one estimator
+   family.
+2. Keep availability (publication lag) separate from completed-quarter
+   association.
+3. Do not promote the vote set, the ifoCAST list, or the elastic-net list as
+   *the* German nowcasting set. Part II tests those inputs downstream and does
+   not reject equal accuracy among them.
 """
 
 

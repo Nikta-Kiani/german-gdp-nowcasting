@@ -1,10 +1,14 @@
 """Build DFM-ready indicator selection matrices.
 
-Produces three binary (origin x series) matrices used by the DFM model package:
+Produces three binary (origin x series) matrices:
 
-  * ``core``     - >= ``min_votes`` consensus across EN / EN-smooth / PLS / fixed-k
-  * ``en_only``  - Elastic Net raw selections (sensitivity baseline)
-  * ``pls_only`` - PLS+VIP top-30 selections (sensitivity baseline)
+  * ``en_only``  - Elastic Net selections (DFM-EN input)
+  * ``pls_only`` - PLS+VIP top-30 (DFM-PLS input)
+  * ``core``     - >= ``min_votes`` vote across EN / EN-smooth / PLS / fixed-k
+                   (used to tune XGBoost; not a claimed unique German set)
+
+The thesis Part II comparison also includes a block-balanced set and a frozen
+ifoCAST reference, built in the DFM scripts rather than here.
 
 Design choices
 --------------
@@ -69,7 +73,7 @@ def build_rate_table(
 
 
 # ---------------------------------------------------------------------------
-# Algorithm-robust core (>= min_votes of N methods)
+# Vote set (>= min_votes of N methods); used to tune XGBoost, not as a DFM input
 # ---------------------------------------------------------------------------
 
 def build_core_matrix(
@@ -143,7 +147,7 @@ def topup_by_block(
     Parameters
     ----------
     core_matrix : pd.DataFrame
-        Binary (origins × series) algorithm-robust core.
+        Binary (origins × series) vote set (≥ min_votes methods).
     matrices : Mapping[str, pd.DataFrame]
         Raw per-method selection matrices (used for expanding rate table).
     meta : pd.DataFrame

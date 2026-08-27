@@ -1,6 +1,8 @@
 # Data Access and Privacy
 
-The empirical data are intentionally not included in this repository.
+The modelling panel used from Part I onward has 585 monthly series after
+deduplication and the discontinued-series filter, spanning January 1991 to
+December 2025. The licensed source workbook is not distributed.
 
 The source workbook combines ifo and Macrobond series with official German and
 European macroeconomic releases. These data may be subject to institutional or

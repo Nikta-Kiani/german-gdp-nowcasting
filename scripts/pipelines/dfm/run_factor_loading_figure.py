@@ -64,10 +64,10 @@ MAIN_CATEGORIES = [
 ]
 
 FACTOR_COLORS = ["#8E44AD", "#4A6FA5"]
-FACTOR_SHORT = ["Factor 1: real activity", "Factor 2: surveys"]
+FACTOR_SHORT = ["Factor 1: real activity", "Factor 2: mixed"]
 FACTOR_LABELS = [
     "Factor 1 — real activity",
-    "Factor 2 — surveys & expectations",
+    "Factor 2 — mixed (surveys largest single category)",
 ]
 
 CACHE_CSV = P.OUT_NOWCASTING / "factor_loading_m3_panel.csv"
@@ -591,13 +591,13 @@ def fig_integrated(cat_df: pd.DataFrame, snap_df: pd.DataFrame) -> "plt.Figure":
 
     caption = f"""DFM factor interpretation: economic content and GDP transmission (2011Q1–2025Q4, M3 origins, DFM-EN inputs).
 
-Panel (a) summarises Stage 1 of the two-step DFM. At each forecast origin the model is re-fitted on the Elastic-Net-selected indicator set; the stacked areas show the share of each economic category in the absolute indicator-to-factor loadings. Factor 1 (purple) is a real-activity composite dominated by production, turnover and orders; Factor 2 (blue) loads mainly on business surveys and expectations. Category shares can spike when very few series are selected at a given origin.
+Panel (a) summarises Stage 1 of the two-step DFM. At each forecast origin the model is re-fitted on the Elastic-Net-selected indicator set; the stacked areas show the share of each economic category in the absolute indicator-to-factor loadings. Factor 1 is a stable real-activity composite: production, turnover, orders and trade carry about 90% of its loading mass before and after COVID. Factor 2 is mixed — surveys are its largest single category (about 31%), but production, turnover and orders still account for about two-thirds of its mass. Category shares can spike when selection keeps few series at a given origin.
 
 Panel (b) plots the Stage-2 DFM-TVP bridge coefficients: how many percentage points of GDP growth each factor implies per unit increase in the latent factor. The loadings are allowed to drift over time (random walk) and COVID quarters are down-weighted. Before 2020, Factor 1 carries most of the GDP transmission; the post-2022 period shows a weaker but positive Factor-1 link consistent with the stagnation regime.
 
 Panel (c) lists the six indicators with the largest absolute loadings on each factor at {quarter} (N={n_ind} active series), displayed as two full-width bar charts so that series names remain readable. Each bar is the EM-estimated Stage-1 loading; colour matches the category legend in panel (a). A positive loading means the indicator co-moves with the factor; negative loadings indicate an inverse relationship within the estimated factor rotation.
 
-Notes: Factors are identified up to sign and rotation; loadings are aligned across origins so that Factor 1 always refers to the hard-activity dimension and Factor 2 to the survey dimension. Factor colours are held constant across all three panels.
+Notes: Factors are identified only up to rotation and sign. Panels (a) and (b) use a rotation realigned at every origin, fixing Factor 1 to co-move positively with industrial production and Factor 2 with the first survey series. That alignment is a labelling convention, not a claim that Factor 2 is a survey factor. Factor colours are held constant across all three panels.
 """
     INTEGRATED_CAPTION.parent.mkdir(parents=True, exist_ok=True)
     INTEGRATED_CAPTION.write_text(caption.strip() + "\n", encoding="utf-8")

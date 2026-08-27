@@ -1,16 +1,16 @@
 """PLS + VIP indicator selection.
 
-Implements Variable Importance in Projection (VIP) scoring for Partial
-Least Squares regression (Wold, 1994).  PLS constructs latent components
-that maximise covariance with GDP rather than variance (like PCA), making
-it "supervised PCA".  In high-multicollinearity macro panels this tends to
-outperform Lasso/EN at identifying a compact, informative predictor set
-(Kelly & Pruitt, 2015, ReStud).
+Variable Importance in Projection (VIP) scores from Partial Least Squares
+(Wold, 1966; Mehmood et al., 2012). Components maximise covariance with the
+target rather than predictor variance. On this German panel the method is
+the extreme hard-data selector (fixed at 30 series). It is not a more
+accurate nowcast than the elastic net: Part II does not reject equal DFM
+accuracy across input sets.
 
 References
 ----------
-Wold, S. (1994). Exponentially Weighted Moving Principal Components Analysis
-    and Projections to Latent Structures. Chemom. Intell. Lab. Syst., 23, 149-161.
+Wold, H. (1966). Estimation of principal components and related models by
+    iterative least squares. In P. R. Krishnaiah (Ed.), Multivariate Analysis.
 Kelly, B. & Pruitt, S. (2015). The three-pass regression filter: A new approach
     to forecasting using many predictors. Journal of Econometrics, 186(2).
 Mehmood, T. et al. (2012). A review of variable selection methods in PLS.

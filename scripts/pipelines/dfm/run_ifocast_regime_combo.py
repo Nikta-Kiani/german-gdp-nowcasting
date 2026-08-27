@@ -1,7 +1,8 @@
-"""Equal-weight combination of ifoCAST and block-balanced DFM nowcasts.
+"""Equal-weight combination of DFM-EN, DFM-block-balanced and DFM-ifoCAST.
 
-Combines saved M3 series only — no DFM re-runs. Writes
-``nowcast_path_combo_equal.csv``.
+Averages the three saved M3 paths — no DFM re-runs. Writes
+``nowcast_path_combo_equal.csv``. This is the thesis combination, not a
+two-model average of ifoCAST and block-balanced alone.
 
 Run (from the repository root):
     python scripts/pipelines/dfm/run_ifocast_regime_combo.py

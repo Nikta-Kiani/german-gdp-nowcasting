@@ -1,8 +1,8 @@
-# Reproducibility Guide
+# Reproducibility
 
 ## Environment
 
-The repository was validated with Python 3.13.5. From the repository root:
+Validated with Python 3.13.5. From the repository root:
 
 ```bash
 python3.13 -m venv .venv
@@ -11,25 +11,21 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[full]"
 ```
 
-The `full` extra installs visualization, notebook, and Bayesian-SV dependencies.
-Exact tested versions are also recorded in `requirements.txt`.
+The `full` extra installs visualisation, notebook, and NumPyro (SV) dependencies. Exact versions are in `requirements.txt`.
 
 ## Fast verification
 
-The tests use synthetic data and do not access private datasets or overwrite
-thesis artifacts:
+The tests use synthetic data. They do not read private files or overwrite thesis artefacts:
 
 ```bash
 python -m unittest discover -s tests -t .
 ```
 
-They cover package imports, path configuration, publication-lag masking,
-quarterly aggregation, indicator-selection smoothing, forecast metrics, and
-no-look-ahead feature construction for XGBoost and the factor-augmented MLP.
+They cover package imports, path configuration, publication-lag masking, the release-block freeze used in the post-COVID counterfactual, quarterly aggregation, selection smoothing, RMSFE / Diebold–Mariano helpers, the Hansen–Lunde–Nason model confidence set, and no-look-ahead features for XGBoost and the factor-augmented MLP.
 
-## Research workflow
+## Notebooks
 
-The notebooks document the analysis in order:
+The notebooks document the analysis in order. They load saved CSVs when those files exist.
 
 1. `01_data_understanding.ipynb`
 2. `02_data_preparation.ipynb`
@@ -39,7 +35,13 @@ The notebooks document the analysis in order:
 6. `06_dfm_nowcasting.ipynb`
 7. `07_xgboost_nowcasting.ipynb`
 
-For scripted full reruns after the private paths are configured:
+Some stored cell outputs predate the 60-series elastic-net cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`, rather than printed RMSFE from an older notebook run.
+
+Part I selects on completed-quarter aggregates. Publication lags and the ragged edge are applied in Part II, not by dropping series from the selection matrices.
+
+## Scripted reruns
+
+After the private paths are set (see [DATA.md](DATA.md)) and notebooks 01–02 have written the prepared panel:
 
 ```bash
 python scripts/pipelines/orchestrators/01_selection.py
@@ -50,24 +52,26 @@ python -m german_gdp_nowcasting.models.mlp.mlp_utils
 python scripts/pipelines/orchestrators/09_finalize.py
 ```
 
-These commands are computationally expensive. They refit expanding-window
-models over the full 2011–2025 evaluation sample and write generated artifacts
-under `outputs/`, which is intentionally ignored by Git.
+These commands refit expanding-window models over 2011–2025 and write to `outputs/`, which Git ignores.
 
-## Real-time safeguards
+The post-COVID DFM-EN release-block attribution reuses the saved observed path and refits only the two hybrid information sets (hard activity frozen; non-hard complement frozen):
 
-The empirical design protects against look-ahead bias by:
+```bash
+python scripts/pipelines/dfm/run_release_block_counterfactual.py
+```
 
-- using expanding training windows;
-- evaluating against first-release GDP;
-- masking each monthly indicator according to its publication lag;
-- filling only the ragged edge visible at each forecast origin;
-- tuning models before the evaluation window or within the available history;
-- applying the same information set and evaluation dates across model classes.
+It writes the four-state forecast paths, quarter-level and mean Shapley loss decompositions, and the PDF figure under `outputs/nowcasting/`. The experiment is a fitted-model accounting identity for 2022Q1–2025Q4 ($N=16$). It does not show that official hard releases are generally harmful; bootstrap intervals for the hard-block contribution include zero.
 
-## Scope of automated verification
+## Real-time protocol
 
-The fast suite validates deterministic building blocks and interface contracts.
-It does not rerun the 60-quarter backtests, Bayesian MCMC, or the full figure
-pipeline. Those results require the licensed data and substantially more
-compute.
+- Expanding training windows; the target quarter never enters estimation.
+- First-release GDP, never a revised vintage, as the scoring target.
+- Per-series publication-lag mask at each monthly origin.
+- Univariate AR fill only on the ragged edge visible at that origin.
+- The same origin grid and information set across model classes.
+
+Predictor revisions are not simulated. The panel is a static historical extract.
+
+## What the tests do not cover
+
+The fast suite does not rerun the 60-quarter backtests, the SV sampler, or the figure pipeline. Those require the licensed workbook and substantially more compute.
