@@ -83,11 +83,11 @@ python -m pip install -e ".[full]"
 jupyter lab notebooks/
 ```
 
-The notebooks document the analysis in reading order. They load saved CSVs when those files exist; they do not re-fit the 60-quarter backtests unless a `FORCE_RERUN` flag is set. If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
+The notebooks document the analysis in reading order. Restart the kernel after a path change so `german_gdp_nowcasting.config.paths` is re-imported. They load saved CSVs when those files exist; they do not re-fit the 60-quarter backtests unless a `FORCE_RERUN` flag is set. If a loaded elastic-net matrix has more than 60 series, or DFM-EN M3 RMSFE is near 0.98, that file predates the cap used in the thesis. Cite the thesis tables, or the files written by `scripts/pipelines/dfm/build_unified_evaluation.py`.
 
 ## Data
 
-The source workbook is an ifo / Macrobond extract and is not distributed. Point the package at a local copy:
+The source workbook is an ifo / Macrobond extract and is not distributed. The notebooks look for it in `Dataset/ifoCAST_DATA.xlsx` next to the repository (or inside it). To point elsewhere:
 
 ```bash
 export GERMAN_GDP_NOWCASTING_DATASET_XLSX="/private/path/ifoCAST_DATA.xlsx"

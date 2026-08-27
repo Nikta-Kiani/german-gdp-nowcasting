@@ -47,26 +47,30 @@ class ConfigPathTests(unittest.TestCase):
             self.assertEqual(paths.REPO_ROOT, REPO_ROOT)
             self.assertEqual(paths.ROOT, REPO_ROOT)
             self.assertEqual(paths.PROJECT_FILES, REPO_ROOT)
-            self.assertEqual(paths.DATA, REPO_ROOT / "data")
-            self.assertEqual(paths.OUTPUTS, REPO_ROOT / "outputs")
-            self.assertEqual(
-                paths.DATASET_XLSX,
-                REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx",
+            self.assertEqual(paths.DATA.name, "data")
+            self.assertEqual(paths.OUTPUTS.name, "outputs")
+            repo_dataset = (REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx").resolve()
+            sibling_dataset = (
+                REPO_ROOT.parent / "Dataset" / "ifoCAST_DATA.xlsx"
+            ).resolve()
+            self.assertIn(paths.DATASET_XLSX, {repo_dataset, sibling_dataset})
+            self.assertTrue(paths.SUPERVISOR_KEPT_XLSX.name.startswith("indicators_kept"))
+            self.assertTrue(
+                paths.SUPERVISOR_DROPPED_XLSX.name.startswith("indicators_dropped")
             )
-            self.assertEqual(
-                paths.SUPERVISOR_EXPORTS,
-                REPO_ROOT / "outputs" / "supervisor_exports",
-            )
-            self.assertEqual(
-                paths.SUPERVISOR_KEPT_XLSX,
-                REPO_ROOT / "outputs" / "supervisor_exports"
-                / "indicators_kept_review.xlsx",
-            )
-            self.assertEqual(
-                paths.SUPERVISOR_DROPPED_XLSX,
-                REPO_ROOT / "outputs" / "supervisor_exports"
-                / "indicators_dropped_review.xlsx",
-            )
+
+    def test_first_existing_prefers_the_file_that_is_present(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            missing = root / "missing.xlsx"
+            present = root / "present.xlsx"
+            present.write_bytes(b"ok")
+            chosen = paths._first_existing([missing, present], missing)
+            self.assertEqual(chosen, present.resolve())
+            none = paths._first_existing([missing], missing)
+            self.assertEqual(none, missing.resolve())
 
     def test_environment_overrides_are_resolved_and_propagated(self) -> None:
         overrides = {

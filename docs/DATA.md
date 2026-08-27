@@ -40,8 +40,14 @@ All of these paths are ignored by Git.
 
 ## Configure private paths
 
-The package defaults to local `data/` and `outputs/` directories. Private files
-can remain elsewhere by setting environment variables:
+The package looks for `ifoCAST_DATA.xlsx` in this order: the environment
+variable below, `<repo>/Dataset/ifoCAST_DATA.xlsx`, then
+`<repo>/../Dataset/ifoCAST_DATA.xlsx` (the original thesis layout). Prepared
+panels and cached nowcasts are read from `<repo>/data` and `<repo>/outputs`
+when those files exist, otherwise from `<repo>/../Project_files/` if that
+working copy is present.
+
+Override any of these with environment variables:
 
 ```bash
 export GERMAN_GDP_NOWCASTING_DATASET_XLSX="/private/path/ifoCAST_DATA.xlsx"

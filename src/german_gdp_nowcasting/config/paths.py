@@ -1,8 +1,10 @@
 """Canonical filesystem locations for data and generated pipeline artifacts.
 
 The package defaults to the clean repository layout, with inputs under
-``<repo>/data`` and generated files under ``<repo>/outputs``. Private data can
-remain outside the repository by setting these environment variables:
+``<repo>/data`` and generated files under ``<repo>/outputs``. If those trees
+are empty, it also looks one directory up (the original thesis layout:
+``<repo>/../Dataset/ifoCAST_DATA.xlsx`` and ``<repo>/../Project_files/``).
+Private data can remain elsewhere by setting these environment variables:
 
 ``GERMAN_GDP_NOWCASTING_DATA_DIR``
     Directory containing ``panel/``, ``metadata/``, and ``qa/``.
@@ -31,19 +33,47 @@ def _environment_path(name: str, default: Path) -> Path:
     return path.resolve()
 
 
+def _first_existing(candidates: list[Path], default: Path) -> Path:
+    """Return the first path that exists, otherwise ``default``."""
+    for path in candidates:
+        if path.exists():
+            return path.resolve()
+    return default.resolve()
+
+
+def _first_tree(
+    default: Path,
+    fallbacks: list[Path],
+    markers: list[str],
+) -> Path:
+    """Return the first directory that already contains a marker file."""
+    for directory in (default, *fallbacks):
+        if any((directory / marker).exists() for marker in markers):
+            return directory.resolve()
+    return default.resolve()
+
+
 # paths.py is <repo>/src/german_gdp_nowcasting/config/paths.py.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
-# Compatibility aliases retained for copied scripts and notebooks that import
-# these public names. In the package layout both denote the clean repository,
-# rather than the former private ``Project_files`` directory and its parent.
+# Compatibility aliases. DATA and OUTPUTS may resolve to a sibling working
+# copy when the repository trees are empty (see ``_first_tree``).
 ROOT = REPO_ROOT
 PROJECT_FILES = REPO_ROOT
+
+# Sibling trees from the original working copy (not in the public repo).
+_LEGACY_ROOT = REPO_ROOT.parent
+_LEGACY_PROJECT = _LEGACY_ROOT / "Project_files"
+_LEGACY_CURSOR_EXPORTS = _LEGACY_ROOT / ".cursor" / "supervisor_exports"
 
 # --- Structured data (panels, metadata, quality assurance) ---
 DATA = _environment_path(
     "GERMAN_GDP_NOWCASTING_DATA_DIR",
-    REPO_ROOT / "data",
+    _first_tree(
+        REPO_ROOT / "data",
+        [_LEGACY_PROJECT / "data"],
+        ["panel/data_df.csv", "panel/data_transformed.csv", "metadata/data_dict_catalog.csv"],
+    ),
 )
 DATA_PANEL = DATA / "panel"
 DATA_METADATA = DATA / "metadata"
@@ -63,8 +93,17 @@ PUB_LAG_CSV = DATA_METADATA / "pub_lag_map.csv"
 # --- Stage outputs (not under versioned `data/`) ---
 OUTPUTS = _environment_path(
     "GERMAN_GDP_NOWCASTING_OUTPUTS_DIR",
-    REPO_ROOT / "outputs",
+    _first_tree(
+        REPO_ROOT / "outputs",
+        [_LEGACY_PROJECT / "outputs"],
+        [
+            "indicator_selection/selection_matrix.csv",
+            "nowcasting/nowcast_results_ar1.csv",
+            "nowcasting/nowcast_results_actpn_en_only.csv",
+        ],
+    ),
 )
+NOTEBOOK_FIGURES = OUTPUTS / "notebooks"
 OUT_INDICATOR_SELECTION = OUTPUTS / "indicator_selection"
 GDP_TARGET_CSV = OUT_INDICATOR_SELECTION / "gdp_target.csv"
 SELECTION_MATRIX_CSV = OUT_INDICATOR_SELECTION / "selection_matrix.csv"
@@ -175,21 +214,47 @@ RELEASE_BLOCK_DECOMPOSITION_CSV = (
 RELEASE_BLOCK_FIG = NOWCAST_FIGURES_DIR / "release_block_counterfactual.pdf"
 
 # --- Source Excel (Macrobond / ifo pull) ---
+_DATASET_DEFAULT = REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx"
 DATASET_XLSX = _environment_path(
     "GERMAN_GDP_NOWCASTING_DATASET_XLSX",
-    REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx",
+    _first_existing(
+        [
+            REPO_ROOT / "Dataset" / "ifoCAST_DATA.xlsx",
+            _LEGACY_ROOT / "Dataset" / "ifoCAST_DATA.xlsx",
+        ],
+        _DATASET_DEFAULT,
+    ),
 )
 
 # --- Supervisor review exports ---
 SUPERVISOR_EXPORTS = _environment_path(
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_EXPORTS_DIR",
-    OUTPUTS / "supervisor_exports",
+    _first_existing(
+        [OUTPUTS / "supervisor_exports", _LEGACY_CURSOR_EXPORTS],
+        OUTPUTS / "supervisor_exports",
+    ),
 )
 SUPERVISOR_KEPT_XLSX = _environment_path(
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_KEPT_XLSX",
-    SUPERVISOR_EXPORTS / "indicators_kept_review.xlsx",
+    _first_existing(
+        [
+            SUPERVISOR_EXPORTS / "indicators_kept_review.xlsx",
+            SUPERVISOR_EXPORTS / "indicators_kept_robert.xlsx",
+            _LEGACY_CURSOR_EXPORTS / "indicators_kept_robert.xlsx",
+            _LEGACY_CURSOR_EXPORTS / "indicators_kept_review.xlsx",
+        ],
+        SUPERVISOR_EXPORTS / "indicators_kept_review.xlsx",
+    ),
 )
 SUPERVISOR_DROPPED_XLSX = _environment_path(
     "GERMAN_GDP_NOWCASTING_SUPERVISOR_DROPPED_XLSX",
-    SUPERVISOR_EXPORTS / "indicators_dropped_review.xlsx",
+    _first_existing(
+        [
+            SUPERVISOR_EXPORTS / "indicators_dropped_review.xlsx",
+            SUPERVISOR_EXPORTS / "indicators_dropped_robert.xlsx",
+            _LEGACY_CURSOR_EXPORTS / "indicators_dropped_robert.xlsx",
+            _LEGACY_CURSOR_EXPORTS / "indicators_dropped_review.xlsx",
+        ],
+        SUPERVISOR_EXPORTS / "indicators_dropped_review.xlsx",
+    ),
 )
