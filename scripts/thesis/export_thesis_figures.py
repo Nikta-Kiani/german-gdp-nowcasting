@@ -2,16 +2,12 @@
 """Export all thesis figures as vector PDFs from the canonical dashboard data.
 
 Reuses the companion dashboard's chart builders and data layer so every
-figure is generated from the same stored result cut. Figures are written to
-``Overleaf-Thesis/figures/`` with stable filenames. In-figure titles are
-stripped: captions live in LaTeX.
+figure is generated from the same stored result cut. Figures are written
+under ``THESIS_ROOT/figures/`` with stable filenames. In-figure titles are
+stripped: captions live in the thesis document.
 
-Expected sibling layout (override with THESIS_ROOT / DASHBOARD_SRC):
-
-    <workspace>/
-      german-gdp-nowcasting/          (this repository)
-      german-gdp-nowcast-dashboard/   (chart and data access)
-      Overleaf-Thesis/                (figures written here)
+Requires the companion dashboard on ``DASHBOARD_SRC``. Write the figures
+to ``THESIS_ROOT``.
 
 Run from the repository root:
 

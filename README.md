@@ -1,35 +1,30 @@
 # German GDP nowcasting
 
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-synthetic-brightgreen)](#tests)
 [![Data](https://img.shields.io/badge/data-licensed%20%7C%20not%20included-lightgrey)](docs/DATA.md)
 
-Code accompanying the master's thesis
+Code for the master's thesis
 *[Nowcasting and Indicator Selection in a Data-Rich Environment: An Application to German GDP Growth](#citation)*.
 
-German GDP growth is the reference series for the German economy. The first official estimate appears only after the quarter has ended. This repository reconstructs a pseudo-real-time nowcast from a 585-series monthly panel under one protocol: a first-release target, a publication-lag map, and expanding training windows. Part I asks which series recursive selectors recover, and whether they agree. Part II puts those sets through one mixed-frequency dynamic factor model and asks whether the monthly panel — and later releases of the hard-activity data the selectors prefer — still help after 2022.
+The first official German GDP estimate arrives about a month after the quarter ends. Until then, a reading on the current quarter has to be inferred from monthly indicators. This repository reconstructs that problem under one pseudo-real-time protocol: a 585-series monthly panel, first-release GDP growth as the target, a publication-lag map, and expanding training windows.
 
-## What the results say
+Part I asks which series recursive selectors recover, and whether they agree. Part II holds one mixed-frequency dynamic factor model fixed, varies the input set, and asks whether the monthly panel — and later releases of the hard-activity data the selectors prefer — still help after 2022.
+
+## What the thesis finds
 
 ![M3 RMSFE by regime](docs/figures/nowcast_rmsfe_by_regime.png)
 
-*M3 RMSFE by regime, 2011Q1–2025Q4. Rows keep the full-sample ranking. Factor models contain the 2020 collapse and rebound; after 2022 that ordering no longer holds. The figure omits the rolling and intercept-corrected AR(1), which lead the post-COVID window in the thesis (0.207 and 0.245). XGBoost's post-COVID bar is the most favourable of five seeds (0.248–0.618).*
+*M3 RMSFE by regime, 2011Q1–2025Q4. Rows keep the full-sample ranking. Factor models contain the 2020 collapse and rebound; after 2022 that ranking no longer holds. The figure omits the rolling and intercept-corrected AR(1), which lead the post-COVID window (0.207 and 0.245). XGBoost's post-COVID bar is the most favourable of five seeds (0.248–0.618).*
 
-**Part I.** Elastic net, a block-balanced variant, partial least squares and gradient-boosting importance all place 65–100% of selected mass on delayed hard activity data (production, turnover, orders, trade, construction), against 29% of the panel, and under-weight timely series relative to the panel's 70% lag-0 share. They agree only weakly on which series: rank correlations 0.28–0.43; only two series are selected by the elastic net at every origin; mean Jaccard overlap with the frozen ifoCAST set is 0.11. Selection is informative about *what kind* of data matters, not about a unique indicator list.
+**Part I.** Elastic net, a block-balanced variant, partial least squares and gradient-boosting importance all place 65–100% of selected mass on delayed hard activity (production, turnover, orders, trade, construction), against 29% of the panel. They under-weight timely series relative to the panel's 70% lag-0 share. They agree only weakly on which series: rank correlations 0.28–0.46; only two series are selected by the elastic net at every origin; mean Jaccard overlap with the frozen ifoCAST set is 0.11. Selection is informative about *what kind* of data matters, not about a unique indicator list.
 
-**Part II.** Over 60 quarters the equal-weight combination of DFM-EN, DFM-block-balanced and DFM-ifoCAST has RMSFE 0.677, against 0.784 for DFM-EN and 2.406 for an expanding AR(1). No test against the AR(1) rejects equal accuracy: the gain is almost entirely the eight pandemic quarters (1.921 against 6.525). After 2022 a rolling AR(1) is most accurate (0.207), and every reported DFM has a higher average RMSFE at M3 than at M1. In the DFM-EN counterfactual, updating the hard-activity block alone almost exactly reproduces that deterioration; updating the non-hard complement leaves RMSFE at its M1 level. Bootstrap intervals for that attribution include zero. The 90% model confidence set retains all eleven headline candidates. Sixteen post-COVID quarters cannot identify a best set or model.
+**Part II.** Over 60 quarters the equal-weight combination of DFM-EN, DFM-block-balanced and DFM-ifoCAST has RMSFE 0.677, against 0.784 for DFM-EN and 2.406 for an expanding AR(1). No test against the AR(1) rejects: almost all of the gain is the eight pandemic quarters (1.921 against 6.525). After 2022 a rolling AR(1) is most accurate (0.207), and every reported DFM has a higher average RMSFE at M3 than at M1. In the DFM-EN counterfactual, updating the hard-activity block alone almost exactly reproduces that rise; updating the rest leaves RMSFE at its M1 level. Bootstrap intervals for that attribution include zero. The 90% model confidence set retains all eleven headline models. Sixteen post-COVID quarters cannot identify a best set or model.
 
 ![Integrated DFM-SV fan chart](docs/figures/nowcast_sv_fanchart.png)
 
-*Integrated DFM-SV nowcasts with 90% intervals, M3 origins. Full-sample coverage is 53 of 60 (88.3%), the average of 97.2% before COVID, 25.0% during it and 100% afterwards. Six of seven misses fall in the eight pandemic quarters.*
+*Integrated DFM-SV nowcasts with 90% intervals, M3 origins. Full-sample coverage is 53 of 60 (88.3%): 97.2% before COVID, 25.0% during it, and 100% afterwards. Six of seven misses fall in the eight pandemic quarters.*
 
-The monthly panel earns its keep as crisis insurance, not as a uniform upgrade over a simple autoregression. The practical reading is a parallel nowcast: the equal-weight factor combination as a reference, short-memory autoregressions as challenge forecasts, and SV intervals not taken at face value during a shock.
-
-## Research questions
-
-1. What monthly information do recursive selection methods recover for German GDP, and do distinct methods agree?
-2. Once those sets enter a mixed-frequency dynamic factor model, how does the choice of indicators affect nowcasts of current-quarter GDP?
-3. After 2022, which specifications remain useful, and do later within-quarter releases of the hard-activity data that selection prefers still improve the nowcast?
+The monthly panel reduces error when a large disturbance is under way. It does not dominate a short-memory autoregression once growth has settled at a new, low-variance mean. The thesis therefore recommends a parallel nowcast: the equal-weight factor combination as a reference, short-memory autoregressions as challenge forecasts, and SV intervals not taken at face value during a shock.
 
 ## Design
 
@@ -44,31 +39,31 @@ Four recursive selectors are recorded at 180 monthly origins (2011M1–2025M12).
 
 Part II holds the mixed-frequency DFM fixed (two factors, Mariano–Murasawa aggregation, Kalman smoothing) and varies the input set: recursively updated EN, block-balanced and PLS selections, plus a frozen ifoCAST reference. Around that backbone sit a TVP bridge, an integrated stochastic-volatility layer, XGBoost on the wide panel, a factor-augmented MLP, expanding / rolling / intercept-corrected AR(1) and a random walk, and the equal-weight combination of DFM-EN, DFM-block-balanced and DFM-ifoCAST.
 
-Evaluation is at M3 for 60 quarters (2011Q1–2025Q4), also at M1 and M2 for the DFM variants, in pre-COVID, COVID and post-COVID windows. Scoring uses RMSFE and MAE, HLN-corrected Diebold–Mariano tests, the Hansen–Lunde–Nason 90% model confidence set, Mincer–Zarnowitz regressions, and interval coverage / CRPS for DFM-SV.
+Evaluation is at M3 for 60 quarters (2011Q1–2025Q4), and also at M1 and M2 for the DFM variants, in pre-COVID, COVID and post-COVID windows. Scoring uses RMSFE and MAE, HLN-corrected Diebold–Mariano tests, the Hansen–Lunde–Nason 90% model confidence set, Mincer–Zarnowitz regressions, and interval coverage / CRPS for DFM-SV.
 
-## Repository layout
+## Layout
 
 ```text
 german-gdp-nowcasting/
-├── notebooks/                 # Narrative, in reading order (01–07)
+├── notebooks/                 # Narrative of the analysis, in reading order (01–07)
 ├── src/german_gdp_nowcasting/
 │   ├── config/                # Portable paths
 │   ├── selection/             # Elastic net, PLS, aggregation, comparison
 │   ├── models/dfm|xgboost|mlp
 │   └── visualization/
-├── scripts/pipelines/         # Full reruns (selection, DFM suite, XGB, figures)
-├── scripts/thesis/            # Compile the stored cut into thesis tables/figures
-├── tests/                     # Synthetic tests; no private data
-├── docs/                      # Data access, reproducibility, figures
+├── scripts/pipelines/         # Full reruns (selection, DFM suite, XGBoost, figures)
+├── scripts/thesis/            # Compile the stored cut into thesis tables and figures
+├── tests/                     # Synthetic tests; no licensed data required
+├── docs/                      # Data access, reproducibility, README figures
 ├── pyproject.toml
 └── requirements.txt
 ```
 
-The Streamlit dashboard and the LaTeX thesis are kept separately. Licensed data and generated outputs are not in this repository. Curated dashboard outputs are published from the private data-only repository [`german-gdp-nowcast-real-data`](https://github.com/Nikta-Kiani/german-gdp-nowcast-real-data).
+The Streamlit dashboard lives in separate repository. Licensed data and generated outputs are not in this repository. The stored result cut used by the dashboard is published from the private companion [`german-gdp-nowcast-real-data`](https://github.com/Nikta-Kiani/german-gdp-nowcast-real-data).
 
-## Quick start
+## Setup
 
-Validated with Python 3.13.5.
+Tested with Python 3.13.5.
 
 ```bash
 git clone https://github.com/Nikta-Kiani/german-gdp-nowcasting.git
@@ -111,27 +106,33 @@ python -m german_gdp_nowcasting.models.mlp.mlp_utils
 python scripts/pipelines/orchestrators/09_finalize.py
 ```
 
-The post-COVID DFM-EN release-block counterfactual is a separate experiment:
+The post-COVID DFM-EN release-block counterfactual and the XGBoost seed check are separate:
 
 ```bash
 python scripts/pipelines/dfm/run_release_block_counterfactual.py
+python scripts/experiments/xgb_sensitivity.py
 ```
 
 Full reruns are expensive and write only to the configured outputs directory. See [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
-To refresh the live dashboard, stage the generated files with
-`german-gdp-nowcast-dashboard/scripts/stage_real_data.py --source <pipeline-root>`
-and publish that directory to the private companion repository.
+Thesis tables and figures are compiled from the stored cut (no re-estimation). Both scripts read through the companion dashboard:
+
+```bash
+python scripts/thesis/generate_thesis_tables.py
+python scripts/thesis/export_thesis_figures.py
+```
+
+They need the companion dashboard checkout (`DASHBOARD_SRC`). Set `THESIS_ROOT` to the directory where tables and figures should be written.
 
 ## Tests
 
-The suite uses synthetic panels and does not read or overwrite thesis data:
+These checks run on small synthetic panels and do not need the licensed workbook. They cover publication-lag masking, the release-block freeze, quarterly aggregation, selection smoothing, RMSFE and Diebold–Mariano helpers, the model confidence set, and no-look-ahead features for XGBoost and the factor MLP.
 
 ```bash
 python -m unittest discover -s tests -t .
 ```
 
-The tests cover imports, path configuration, publication lags, the release-block freeze, quarterly aggregation, selection smoothing, RMSFE / Diebold–Mariano helpers, the model confidence set, and no-look-ahead feature construction.
+They do not rerun the 60-quarter backtests or overwrite any thesis outputs.
 
 ## Limits of the public code
 
@@ -139,7 +140,3 @@ The tests cover imports, path configuration, publication lags, the release-block
 - The predictor panel is a static historical extract, not a vintage-by-vintage database, so indicator revisions are not simulated.
 - The evaluation has 60 quarters, of which 16 are post-COVID. The 90% MCS retains every headline model; that is a failure to eliminate, not proof of equal accuracy.
 - Expanding-window DFM fits and the SV sampler need substantial compute.
-
-## Citation
-
-Nikta Kiani, *Nowcasting and Indicator Selection in a Data-Rich Environment: An Application to German GDP Growth*, Master's thesis, Ludwig-Maximilians-Universität München, September 2026.

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Wave 3: rebuild all evaluation tables, figures and contribution caches.
+"""Rebuild evaluation tables, figures and contribution caches from saved nowcasts.
 
-Read-only over the regenerated nowcast CSVs (except the contribution cache,
-which is rebuilt with --rebuild-contrib). Run only after ALL nowcasts exist
-(DFM-EN/core/PLS, ifoCAST, TVP, SV, block-balanced, combo, XGB, MLP-Factor).
+Reads the regenerated nowcast CSVs (except the contribution cache, which is
+rebuilt with --rebuild-contrib). Run only after all nowcasts exist:
+DFM-EN / PLS, ifoCAST, TVP, SV, block-balanced, combo, XGBoost, MLP-Factor.
 """
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ DFM = Path(__file__).resolve().parent.parent / "dfm"
 STEPS = [
     (DFM, ["build_unified_evaluation.py"]),
     (DFM, ["run_horizon_profile.py"]),
+    (DFM, ["run_horizon_bias_variance.py"]),
     (DFM, ["run_post_covid_benchmarks.py"]),
     (DFM, ["run_all_thesis_figures.py", "--rebuild-contrib"]),
 ]

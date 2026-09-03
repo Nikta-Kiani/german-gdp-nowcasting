@@ -12,7 +12,6 @@ reports/figures/
 
 # Separate projects and local workspace material
 dashboard/
-Overleaf-Thesis/
 .cursor/
 _archive*/
 *backup*/

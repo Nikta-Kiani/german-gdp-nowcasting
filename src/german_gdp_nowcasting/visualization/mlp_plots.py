@@ -332,6 +332,6 @@ if __name__ == "__main__":
         plt.close(fig)
         overleaf_path = OVERLEAF_FIG / fname
         overleaf_path.write_bytes((FIG / fname).read_bytes())
-        print(f"Copied to Overleaf: {overleaf_path}")
+        print(f"Copied to thesis figures: {overleaf_path}")
 
     print("Done.")

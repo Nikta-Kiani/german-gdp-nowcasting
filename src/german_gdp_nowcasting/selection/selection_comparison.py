@@ -1012,7 +1012,7 @@ importance, across methods.
   panel's 70% lag-0 share. That rejects a soft-data-dominance reading of this
   completed-quarter selection problem.
 - **Series disagreement.** Spearman rank correlations among the four methods are
-  0.28–0.43. Only two series are selected by the elastic net at every origin.
+  0.28–0.46. Only two series are selected by the elastic net at every origin.
   Mean Jaccard overlap with the frozen ifoCAST set is 0.11. Agreement is about
   *kind* of data, not about a shared list.
 - **COVID rotation is estimator-sensitive.** The pooled EN survey share rises

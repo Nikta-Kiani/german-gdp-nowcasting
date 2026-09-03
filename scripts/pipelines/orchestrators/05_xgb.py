@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Rerun XGBoost nowcasts (retune + full SHAP-pruned loop) under new aggregation.
+"""Retune and run the SHAP-pruned XGBoost nowcast on the coverage-eligible panel.
 
-Mirrors notebook 07 headline calls. The quarterly feature aggregation changed
-(raw-level bridge), so both tuning and the 60-origin loop are regenerated.
+Mirrors the notebook 07 headline calls: one pre-2011 hyperparameter search,
+then the expanding-window M3 loop with quarterly raw-level aggregation.
 """
 from __future__ import annotations
 

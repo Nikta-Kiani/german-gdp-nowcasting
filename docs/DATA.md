@@ -1,12 +1,12 @@
-# Data Access and Privacy
+# Data
 
 The modelling panel used from Part I onward has 585 monthly series after
 deduplication and the discontinued-series filter, spanning January 1991 to
 December 2025. The licensed source workbook is not distributed.
 
-The source workbook combines ifo and Macrobond series with official German and
-European macroeconomic releases. These data may be subject to institutional or
-commercial redistribution restrictions. Derived panels, metadata exports, and
+The workbook combines ifo and Macrobond series with official German and
+European macroeconomic releases. These data may be subject to institutional
+or commercial redistribution restrictions. Derived panels, metadata, and
 model outputs are excluded for the same reason.
 
 ## Expected inputs
@@ -16,9 +16,10 @@ The preparation notebooks expect:
 - a source workbook named `ifoCAST_DATA.xlsx`;
 - sheets containing the raw monthly panel, transformation metadata, and
   first-release GDP vintages;
-- `data/metadata/pub_lag_map.csv`, containing `id` and `pub_lag`;
-- optional review workbooks documenting approved indicator changes. Notebook
-  02 can infer the approved additions from the lag map when these are absent.
+- `data/metadata/pub_lag_map.csv`, with columns `id` and `pub_lag`;
+- optional review workbooks documenting approved indicator changes.
+  Notebook 02 can infer the approved additions from the lag map when
+  these files are absent.
 
 Later pipeline stages consume files produced by the preparation notebooks:
 
@@ -65,6 +66,6 @@ export GERMAN_GDP_NOWCASTING_SUPERVISOR_DROPPED_XLSX="/private/path/indicators_d
 
 ## What can be reproduced without the private data?
 
-The complete package can be imported, and the automated test suite runs on
-small synthetic panels. Reproducing the thesis estimates, tables, and figures
-requires access to the original licensed data.
+The package imports, and the test suite in `tests/` runs on small synthetic
+panels. Reproducing the thesis estimates, tables, and figures requires
+access to the original licensed data.

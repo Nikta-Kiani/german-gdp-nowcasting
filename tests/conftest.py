@@ -1,4 +1,4 @@
-"""Test bootstrap for the src-layout package."""
+"""Path bootstrap so pytest can import the src-layout package."""
 
 from __future__ import annotations
 

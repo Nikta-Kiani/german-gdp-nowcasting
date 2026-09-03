@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Rerun indicator-selection matrices under the thesis specification.
+"""Rebuild the recursive selection matrices used in the thesis.
 
-Reproduces the notebook 03–05 headline calls (capped EN, fixed-k, PLS,
-frequency-smoothed EN, and the DFM input matrices) and overwrites the
-canonical selection artefacts. GDP target is reused from gdp_target.csv.
+Reproduces the notebook 03–05 calls: capped elastic net, fixed-k, PLS,
+frequency-smoothed EN, and the DFM input matrices. The GDP target is reused
+from gdp_target.csv.
 """
 from __future__ import annotations
 

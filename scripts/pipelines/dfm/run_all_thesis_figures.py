@@ -51,7 +51,9 @@ HEADLINE_MODELS: dict[str, Path] = {
     "AR1": P.AR1_RESULTS_CSV,
     "DFM-ifoCAST": P.IFO_RESULTS_CSV,
     "DFM-EN": P.actpn_results_csv("en_only"),
+    "DFM-PLS": P.actpn_results_csv("pls_only"),
     "DFM-BlockBalanced": P.BLOCKBALANCED_RESULTS_CSV,
+    "DFM-TVP": P.TVP_RESULTS_CSV,
     "DFM-SV-k2": P.ACTPN_SV_RESULTS_K2_CSV,
     "combo_equal": P.COMBO_EQUAL_PATH_CSV,
     "XGB-Full": P.xgb_results_csv("full"),
@@ -364,12 +366,20 @@ def main() -> None:
     print("\n[7] Evaluation scripts (thesis_01–05)")
     import build_unified_evaluation  # noqa: E402
     import run_horizon_profile  # noqa: E402
+    import run_horizon_bias_variance  # noqa: E402
     import run_post_covid_benchmarks  # noqa: E402
     build_unified_evaluation.main()
     run_horizon_profile.build_table().to_csv(P.OUT_NOWCASTING / "horizon_profile_table.csv", index=False)
     run_horizon_profile.make_figure(
         pd.read_csv(P.OUT_NOWCASTING / "horizon_profile_table.csv"),
         FIG / "thesis_04_horizon_profile.png",
+    )
+    run_horizon_bias_variance.bias_variance_table().to_csv(
+        P.OUT_NOWCASTING / "horizon_bias_variance_table.csv", index=False,
+    )
+    run_horizon_bias_variance.revision_informativeness_table().to_csv(
+        P.OUT_NOWCASTING / "horizon_revision_informativeness_table.csv",
+        index=False,
     )
     models, y = run_post_covid_benchmarks.build_models()
     tbl = run_post_covid_benchmarks.results_table(models, y)

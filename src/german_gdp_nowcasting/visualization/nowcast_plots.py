@@ -1,17 +1,9 @@
 """Economics-focused plots for the DFM nowcasting notebook.
 
-A small, single-responsibility module so that styling and palette stay
-consistent across every figure used in the thesis. All figures honour:
-
-* white background, no top/right spines
-* light dashed y-grid
-* a single, extended COVID recession band (2020Q1-2021Q4)
-* percentage-point y-units
-* a tonal, colour-blind-aware palette across DFM input sets and benchmarks
-
-The visual language was tightened in May 2026: tonal colours, refined
-typography, restrained gridlines, and tighter spacing -- aiming for a
-look closer to ifo/Bundesbank publication figures.
+Styling and palette stay consistent across the thesis figures: white
+background, no top/right spines, a light dashed y-grid, a single COVID
+band (2020Q1–2021Q4), percentage-point y-units, and a colour-blind-aware
+palette across DFM input sets and benchmarks.
 """
 
 from __future__ import annotations
@@ -58,9 +50,8 @@ MODEL_LABELS: dict[str, str] = {
     "SV_k2":      "DFM-SV (k=2, integrated)",
 }
 
-# Per the user's request: only the COVID episode is highlighted, and the
-# band is extended to span the COVID + immediate-aftermath period
-# (2020Q1-2021Q4). The GFC and Eurocrisis bands are intentionally removed.
+# Only the COVID episode is highlighted (2020Q1–2021Q4). The GFC and
+# euro-crisis bands are omitted so the evaluation windows stay readable.
 DEFAULT_RECESSIONS: list[tuple[str, str]] = [
     ("2020Q1", "2021Q4"),
 ]

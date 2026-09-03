@@ -1,4 +1,4 @@
-"""Unittest discovery bootstrap for the src-layout package."""
+"""Synthetic tests for the real-time protocol. They do not read licensed data."""
 
 from __future__ import annotations
 

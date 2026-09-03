@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Rerun DFM-EN nowcasts (en_only / core / pls_only) + AR1/RW baselines + tables.
+"""Fit DFM-EN, DFM-PLS and the AR(1) / random-walk baselines.
 
-Mirrors notebook 06 headline calls. DFM consumes the monthly transformed panel
-(unchanged) but the EN-derived selection matrices changed under the new
-aggregation, so all EN/PLS/core DFM nowcasts are regenerated.
+Mirrors the notebook 06 estimation loop on the monthly transformed panel and
+the recursively updated EN / PLS / vote-set matrices from 01_selection.py.
 """
 from __future__ import annotations
 

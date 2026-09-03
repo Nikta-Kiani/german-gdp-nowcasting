@@ -1,7 +1,7 @@
-"""Plotting helpers for the XGBoost nowcasting notebook (stage 05).
+"""Plotting helpers for the XGBoost nowcasting notebook.
 
-Reuses the publication style from ``nowcast_plots`` (stage 04) so thesis
-figures are visually consistent across DFM and XGB benchmarks.
+Reuses the publication style from ``nowcast_plots`` so DFM and XGBoost
+figures share the same palette and typography.
 """
 
 from __future__ import annotations
@@ -23,7 +23,8 @@ from .nowcast_plots import (
     _save,
 )
 
-# Family palettes: baselines/DFM/SV follow stage-04 MODEL_COLORS; XGB uses sage–mint greens.
+# Family palettes: baselines/DFM/SV follow nowcast_plots.MODEL_COLORS;
+# XGBoost uses sage–mint greens.
 BASELINE_PALETTE: dict[str, str] = {
     k: MODEL_COLORS[k] for k in ("RW", "AR1") if k in MODEL_COLORS
 }
@@ -36,7 +37,9 @@ DFM_ROSE_PALETTE: dict[str, str] = {
     "en_only": MODEL_COLORS["en_only"],
     "DFM-EN": MODEL_COLORS["en_only"],
     "DFM-ifoCAST": MODEL_COLORS["ifoCAST"],
+    "DFM-PLS": "#CE809C",
     "DFM-BlockBalanced": MODEL_COLORS["blockbalanced"],
+    "DFM-TVP": "#B07AA1",
     "combo_equal": "#D4A574",
 }
 
@@ -47,7 +50,7 @@ SV_BLUE_PALETTE: dict[str, str] = {
 # Legend / bar order: baselines → DFM → ensemble → ML
 DEFAULT_MODEL_ORDER: list[str] = [
     "RW", "AR1",
-    "DFM-ifoCAST", "DFM-EN", "DFM-BlockBalanced",
+    "DFM-ifoCAST", "DFM-EN", "DFM-PLS", "DFM-BlockBalanced", "DFM-TVP",
     "DFM-SV-k2", "combo_equal",
     "XGB-Full",
 ]
@@ -64,14 +67,16 @@ XGB_MODEL_LABELS: dict[str, str] = {
     "XGB-Full": "XGBoost (Full + SHAP)",
     "DFM-EN": "DFM-EN",
     "DFM-ifoCAST": "DFM-ifoCAST",
+    "DFM-PLS": "DFM-PLS",
     "DFM-BlockBalanced": "DFM-k20",
+    "DFM-TVP": "DFM-TVP",
     "DFM-SV-k2": "DFM-SV (k=2, integrated)",
     "combo_equal": "Equal combo",
 }
 
 
 def setup_style() -> None:
-    """Apply stage-04 matplotlib rcParams."""
+    """Apply the shared matplotlib rcParams from ``nowcast_plots``."""
     _dfm_setup_style()
 
 
@@ -97,7 +102,7 @@ def _color_for(name: str) -> str:
     if name in DFM_ROSE_PALETTE:
         return DFM_ROSE_PALETTE[name]
     if name.startswith("DFM-"):
-        return DFM_ROSE_PALETTE["core"]
+        return MODEL_COLORS["en_only"]
     return MODEL_COLORS.get(name, "#94A3B8")
 
 
@@ -259,9 +264,7 @@ def fig_rmsfe_by_regime(
     title: str = "Predictive accuracy by economic regime (RMSFE, M3)",
     save: str | Path | None = None,
 ) -> plt.Figure:
-    """Grouped bar chart matching stage-04 layout: regimes on the x-axis,
-    one bar per model within each regime group (pre-COVID | COVID | post-COVID).
-    """
+    """Grouped bar chart of RMSFE by regime, one bar per model in each window."""
     regimes = regimes or DEFAULT_REGIMES
     source = results_by_model
     if models is not None:

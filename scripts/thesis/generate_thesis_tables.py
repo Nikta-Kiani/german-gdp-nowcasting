@@ -5,12 +5,8 @@ Every numeric cell is read from the stored result cut (via the companion
 dashboard data layer) or recomputed with the same derivations. The script
 prints verification lines before writing booktabs files.
 
-Expected sibling layout (override with THESIS_ROOT / DASHBOARD_SRC):
-
-    <workspace>/
-      german-gdp-nowcasting/          (this repository)
-      german-gdp-nowcast-dashboard/   (chart and data access)
-      Overleaf-Thesis/                (tables written here)
+Requires the companion dashboard on ``DASHBOARD_SRC``. Write the tables
+to ``THESIS_ROOT``.
 
 Run from the repository root:
 
